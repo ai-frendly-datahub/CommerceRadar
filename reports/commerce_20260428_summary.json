@@ -1,0 +1,31 @@
+{
+  "category": "commerce",
+  "date": "2026-04-28",
+  "generated_at": "2026-04-28T12:18:47.021771+00:00",
+  "article_count": 2,
+  "matched_count": 2,
+  "source_count": 8,
+  "top_entities": [
+    {
+      "name": "ABC코스메틱",
+      "count": 1
+    },
+    {
+      "name": "노워시 퍼퓸 헤어오일",
+      "count": 1
+    },
+    {
+      "name": "Tokyo Beauty Distribution",
+      "count": 1
+    },
+    {
+      "name": "Tokyo Beauty Select",
+      "count": 1
+    },
+    {
+      "name": "서울리빙팩토리",
+      "count": 1
+    }
+  ],
+  "warnings": []
+}

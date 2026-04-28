@@ -32,6 +32,7 @@ CommerceRadar/
 | Combo card output | `src/flomers_kg/combo_card.py` |
 | Query intent/entity parsing | `src/flomers_kg/query_planner.py` |
 | Data quality score | `src/flomers_kg/data_quality.py` |
+| Dashboard reports | `src/flomers_kg/reporting.py`, `scripts/build_report_artifacts.py` |
 | Source strategy | `docs/02_data_source_map.md`, `config/data_sources.yaml` |
 | MVP product scope | `docs/18_product_requirements.md` |
 | Risk and governance | `docs/08_compliance_and_governance.md`, `docs/19_risk_register.md` |
@@ -48,6 +49,7 @@ CommerceRadar/
 
 ```bash
 python3 -m pytest -q
+python3 scripts/build_report_artifacts.py
 python3 scripts/run_sample_search.py
 python3 scripts/run_advanced_analysis.py
 ```

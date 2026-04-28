@@ -1,4 +1,4 @@
-.PHONY: install test sample graph
+.PHONY: install test sample graph report
 
 install:
 	pip install -e .[dev]
@@ -11,3 +11,6 @@ sample:
 
 graph:
 	python scripts/build_sample_graph.py
+
+report:
+	python scripts/build_report_artifacts.py

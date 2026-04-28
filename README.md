@@ -64,12 +64,14 @@ CommerceRadar/
 │   ├── scoring.py
 │   ├── graph.py
 │   ├── search.py
+│   ├── reporting.py
 │   ├── extraction_templates.py
 │   └── sample_pipeline.py
 ├── scripts/
 │   ├── build_sample_graph.py
 │   ├── run_sample_search.py
-│   └── run_advanced_analysis.py
+│   ├── run_advanced_analysis.py
+│   └── build_report_artifacts.py
 ├── data/samples/
 │   ├── manufacturers.jsonl
 │   ├── distributors.jsonl
@@ -95,6 +97,7 @@ CommerceRadar/
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .
+python scripts/build_report_artifacts.py
 python scripts/run_sample_search.py
 ```
 

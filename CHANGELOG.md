@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## v0.2.1 - 워크스페이스 대시보드 리포트
+
+### Added
+
+- Dashboard-readable `commerce_YYYYMMDD_summary.json`, HTML report, and `reports/index.html` generation.
+- Report builder module `src/flomers_kg/reporting.py`.
+- Report artifact command `scripts/build_report_artifacts.py` and Makefile `report` target.
+
+### Verified
+
+- `python3 -m pytest -q`
+- `python3 scripts/build_report_artifacts.py`
+
 ## v0.2.0 - 분석 고도화
 
 ### Added
