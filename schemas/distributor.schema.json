@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Distributor",
+  "type": "object",
+  "required": ["id", "name", "country"],
+  "properties": {
+    "id": {"type": "string"},
+    "name": {"type": "string"},
+    "country": {"type": "string"},
+    "locations": {"type": "array", "items": {"type": "string"}},
+    "warehouse_locations": {"type": "array", "items": {"type": "string"}},
+    "portfolio_categories": {"type": "array", "items": {"type": "string"}},
+    "handled_brands": {"type": "array", "items": {"type": "string"}},
+    "distribution_channels": {"type": "array", "items": {"type": "string"}},
+    "trade_types": {"type": "array", "items": {"type": "string"}},
+    "logistics_capabilities": {"type": "array", "items": {"type": "string"}},
+    "strengths": {"type": "array", "items": {"type": "string"}},
+    "weaknesses": {"type": "array", "items": {"type": "string"}},
+    "source_urls": {"type": "array", "items": {"type": "string"}}
+  }
+}

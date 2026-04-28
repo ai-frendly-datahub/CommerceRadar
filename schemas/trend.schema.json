@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Trend",
+  "type": "object",
+  "required": ["id", "name", "countries", "channels"],
+  "properties": {
+    "id": {"type": "string"},
+    "name": {"type": "string"},
+    "countries": {"type": "array", "items": {"type": "string"}},
+    "channels": {"type": "array", "items": {"type": "string"}},
+    "keywords": {"type": "array", "items": {"type": "string"}},
+    "related_categories": {"type": "array", "items": {"type": "string"}},
+    "signal_strength": {"type": "number", "minimum": 0, "maximum": 1},
+    "seasonality": {"type": "string"},
+    "source_urls": {"type": "array", "items": {"type": "string"}}
+  }
+}

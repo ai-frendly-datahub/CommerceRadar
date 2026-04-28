@@ -1,0 +1,177 @@
+sources:
+  - id: manufacturer_websites
+    name: Manufacturer Websites
+    type: html
+    enabled: true
+    trust_tier: T3_public_web
+    domain_scope: manufacturer
+    verification_role: primary_discovery
+    info_purpose:
+      - product_specs
+      - catalog
+      - oem_odm
+      - moq
+      - lead_time
+    config:
+      event_model: manufacturer_product_page
+      canonical_key_fields:
+        - manufacturer_id
+        - product_url
+
+  - id: korea_factory_registration
+    name: Korea Factory Registration
+    type: api
+    url: https://www.data.go.kr/
+    enabled: true
+    trust_tier: T1_official
+    domain_scope: manufacturer
+    verification_role: official_registration_reference
+    info_purpose:
+      - manufacturer_candidate_discovery
+      - registration_verification
+    config:
+      event_model: factory_registration_record
+      canonical_key_fields:
+        - business_registration_number
+        - factory_registration_number
+
+  - id: korea_ecommerce_business_registration
+    name: Korea Ecommerce Business Registration
+    type: api
+    url: https://www.data.go.kr/
+    enabled: true
+    trust_tier: T1_official
+    domain_scope: seller
+    verification_role: official_registration_reference
+    info_purpose:
+      - seller_candidate_discovery
+      - ecommerce_registration_verification
+    config:
+      event_model: ecommerce_business_registration_record
+      canonical_key_fields:
+        - business_registration_number
+        - marketplace_url
+
+  - id: naver_datalab
+    name: NAVER DataLab
+    type: naver_datalab
+    url: https://datalab.naver.com/
+    enabled: true
+    trust_tier: T1_official_platform
+    domain_scope: trend
+    verification_role: attention_reference
+    info_purpose:
+      - search_attention_index
+      - shopping_interest
+      - purchase_interest
+    config:
+      event_model: search_attention_index
+      canonical_key_fields:
+        - keyword
+        - category
+        - date
+        - region
+
+  - id: kosis
+    name: KOSIS Online Shopping Statistics
+    type: api
+    url: https://kosis.kr/
+    enabled: true
+    trust_tier: T1_official
+    domain_scope: market_statistics
+    verification_role: official_statistics_reference
+    info_purpose:
+      - online_shopping_statistics
+      - crossborder_demand_proxy
+    config:
+      event_model: commerce_statistics_snapshot
+      canonical_key_fields:
+        - statistic_id
+        - period
+        - category
+
+  - id: customs_trade_statistics
+    name: Customs Trade Statistics
+    type: api
+    url: https://uncomtrade.org/
+    enabled: true
+    trust_tier: T1_official
+    domain_scope: trade_flow
+    verification_role: official_trade_reference
+    info_purpose:
+      - hs_code_trade_flow
+      - import_export_demand_proxy
+    config:
+      event_model: trade_flow_snapshot
+      canonical_key_fields:
+        - hs_code
+        - origin_country
+        - destination_country
+        - period
+
+  - id: rakuten_web_service
+    name: Rakuten Web Service
+    type: api
+    url: https://webservice.rakuten.co.jp/
+    enabled: true
+    trust_tier: T2_platform
+    domain_scope: target_market
+    verification_role: platform_market_reference
+    info_purpose:
+      - japan_product_price
+      - ranking
+      - review_signal
+      - purchase_interest
+    config:
+      event_model: marketplace_product_rank
+      canonical_key_fields:
+        - platform
+        - product_id
+        - category
+        - date
+
+  - id: flomers_internal_transactions
+    name: Flomers Internal Transactions
+    type: first_party
+    enabled: true
+    trust_tier: T1_first_party
+    domain_scope: transaction_result
+    verification_role: validated_trade_outcome
+    info_purpose:
+      - test_transaction
+      - order_count
+      - revenue
+      - returns
+      - contract_conversion
+      - reorder
+    config:
+      event_model: transaction_result
+      canonical_key_fields:
+        - match_id
+        - test_period
+
+  - id: xiaohongshu_open_platform
+    name: Xiaohongshu Open Platform
+    type: permissioned_api
+    enabled: false
+    trust_tier: T2_permissioned_platform
+    domain_scope: target_market
+    verification_role: permissioned_attention_reference
+    info_purpose:
+      - china_content_signal
+      - commerce_attention_signal
+    config:
+      event_model: permissioned_platform_attention_signal
+
+  - id: douyin_open_platform
+    name: Douyin Open Platform
+    type: permissioned_api
+    enabled: false
+    trust_tier: T2_permissioned_platform
+    domain_scope: target_market
+    verification_role: permissioned_attention_reference
+    info_purpose:
+      - china_shortform_signal
+      - live_commerce_attention_signal
+    config:
+      event_model: permissioned_platform_attention_signal

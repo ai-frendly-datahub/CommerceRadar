@@ -1,0 +1,25 @@
+weights:
+  manufacturer_product_fit: 25
+  distributor_portfolio_fit: 20
+  distributor_location_logistics_fit: 10
+  seller_portfolio_fit: 20
+  trend_fit: 15
+  execution_feasibility: 10
+  risk_penalty_max: 20
+
+thresholds:
+  strong_recommend: 90
+  recommend: 80
+  conditional_test: 70
+  hold: 60
+
+risk_penalties:
+  certification_required: 5
+  customs_complexity: 4
+  ip_risk: 8
+  low_margin: 6
+  high_shipping_cost: 5
+  high_return_risk: 4
+  weak_fulfillment: 4
+  weak_content: 3
+  price_competition: 5

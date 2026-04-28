@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComboCard",
+  "type": "object",
+  "required": ["title", "score", "recommendation", "entities", "reasons", "risks", "next_actions"],
+  "properties": {
+    "title": {"type": "string"},
+    "score": {"type": "number"},
+    "recommendation": {"type": "string"},
+    "entities": {"type": "object"},
+    "target_country": {"type": "string"},
+    "target_channels": {"type": "array", "items": {"type": "string"}},
+    "reasons": {"type": "array", "items": {"type": "string"}},
+    "risks": {"type": "array", "items": {"type": "string"}},
+    "next_actions": {"type": "array", "items": {"type": "string"}},
+    "evidence_ids": {"type": "array", "items": {"type": "string"}}
+  }
+}

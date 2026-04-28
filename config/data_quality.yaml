@@ -1,0 +1,26 @@
+version: 0.2
+quality_score:
+  completeness: 25
+  source_confidence: 25
+  freshness: 20
+  entity_resolution_confidence: 15
+  operator_verification: 15
+  conflict_penalty_max: 20
+
+source_confidence_defaults:
+  public_web: 0.35
+  platform_public: 0.45
+  official_api: 0.75
+  company_submitted: 0.65
+  operator_verified: 0.85
+  test_transaction: 0.95
+  reorder_or_settlement: 1.0
+
+freshness_days:
+  seller_best_seller: 14
+  review_keywords: 30
+  product_page: 90
+  distributor_portfolio: 120
+  business_status: 30
+  certification_recall: 30
+  market_statistics: 120

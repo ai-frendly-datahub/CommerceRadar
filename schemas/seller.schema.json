@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Seller",
+  "type": "object",
+  "required": ["id", "name", "country", "channels"],
+  "properties": {
+    "id": {"type": "string"},
+    "name": {"type": "string"},
+    "country": {"type": "string"},
+    "channels": {"type": "array", "items": {"type": "string"}},
+    "portfolio_products": {"type": "array", "items": {"type": "string"}},
+    "best_sellers": {"type": "array", "items": {"type": "string"}},
+    "price_band": {"type": "string"},
+    "categories": {"type": "array", "items": {"type": "string"}},
+    "content_style": {"type": "array", "items": {"type": "string"}},
+    "target_customer": {"type": "array", "items": {"type": "string"}},
+    "trend_keywords": {"type": "array", "items": {"type": "string"}},
+    "review_keywords": {"type": "array", "items": {"type": "string"}},
+    "commerce_capabilities": {"type": "array", "items": {"type": "string"}},
+    "source_urls": {"type": "array", "items": {"type": "string"}}
+  }
+}

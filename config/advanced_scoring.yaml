@@ -1,0 +1,80 @@
+version: 0.2
+purpose: "Evidence-aware contextual matching score"
+
+components:
+  product_fit:
+    weight: 18
+    signals:
+      - product_country_fit
+      - product_channel_fit
+      - spec_keyword_fit
+      - moq_testability
+  distributor_fit:
+    weight: 15
+    signals:
+      - portfolio_category_fit
+      - trade_type_fit
+      - location_coverage_fit
+      - logistics_capability_fit
+  seller_fit:
+    weight: 15
+    signals:
+      - portfolio_product_fit
+      - content_style_fit
+      - channel_fit
+      - review_keyword_fit
+  trend_fit:
+    weight: 14
+    signals:
+      - keyword_trend_overlap
+      - country_trend_strength
+      - channel_trend_strength
+  market_potential:
+    weight: 12
+    signals:
+      - market_growth
+      - search_growth
+      - platform_ranking_signal
+      - trade_flow_growth
+  economics:
+    weight: 10
+    signals:
+      - expected_margin
+      - price_band_fit
+      - shipping_cost_fit
+      - commission_fit
+  execution_feasibility:
+    weight: 8
+    signals:
+      - manufacturer_response_score
+      - distributor_operational_readiness
+      - seller_commerce_capability
+      - sample_readiness
+  evidence_confidence:
+    weight: 8
+    signals:
+      - source_reliability
+      - evidence_count
+      - verified_by_operator
+      - validated_by_transaction
+
+penalties:
+  risk_penalty_max: 25
+  staleness_penalty_max: 10
+  risks:
+    certification_required: 6
+    customs_complexity: 5
+    ip_risk: 10
+    low_margin: 7
+    high_shipping_cost: 6
+    high_return_risk: 5
+    weak_fulfillment: 5
+    weak_content: 4
+    price_competition: 6
+    insufficient_evidence: 8
+
+thresholds:
+  strong_recommend: 90
+  recommend: 80
+  conditional_test: 70
+  hold: 60

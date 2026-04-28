@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TransactionResult",
+  "type": "object",
+  "required": ["id", "match_id", "status", "started_at"],
+  "properties": {
+    "id": {"type": "string"},
+    "match_id": {"type": "string"},
+    "status": {"type": "string", "enum": ["planned", "sample_sent", "testing", "contracted", "reordered", "failed", "paused"]},
+    "started_at": {"type": "string"},
+    "ended_at": {"type": "string"},
+    "metrics": {"type": "object"},
+    "qualitative_findings": {"type": "array", "items": {"type": "string"}},
+    "failure_reasons": {"type": "array", "items": {"type": "string"}},
+    "next_actions": {"type": "array", "items": {"type": "string"}}
+  }
+}

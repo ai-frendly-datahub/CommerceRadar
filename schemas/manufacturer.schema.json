@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Manufacturer",
+  "type": "object",
+  "required": ["id", "name", "country", "source_urls"],
+  "properties": {
+    "id": {"type": "string"},
+    "name": {"type": "string"},
+    "country": {"type": "string"},
+    "region": {"type": "string"},
+    "website": {"type": "string"},
+    "categories": {"type": "array", "items": {"type": "string"}},
+    "production_capabilities": {"type": "array", "items": {"type": "string"}},
+    "oem_available": {"type": ["boolean", "null"]},
+    "odm_available": {"type": ["boolean", "null"]},
+    "certifications": {"type": "array", "items": {"type": "string"}},
+    "export_experience": {"type": "array", "items": {"type": "string"}},
+    "response_score": {"type": ["number", "null"]},
+    "trust_level": {"type": "integer", "minimum": 1, "maximum": 7},
+    "source_urls": {"type": "array", "items": {"type": "string"}}
+  }
+}

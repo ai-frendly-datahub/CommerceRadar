@@ -1,0 +1,69 @@
+nodes:
+  - Manufacturer
+  - Product
+  - ProductSpec
+  - Distributor
+  - Seller
+  - Portfolio
+  - Location
+  - Channel
+  - Platform
+  - Trend
+  - Keyword
+  - Category
+  - Country
+  - TradeCondition
+  - Transaction
+  - Risk
+  - SourceDocument
+
+relationships:
+  manufacturer:
+    - PRODUCES
+    - HAS_CERTIFICATION
+    - EXPORTS_TO
+    - HAS_SOURCE
+  product:
+    - HAS_SPEC
+    - BELONGS_TO
+    - HAS_KEYWORD
+    - MATCHES_TREND
+    - REQUIRES_CERTIFICATION
+    - SUITABLE_FOR
+    - SUITABLE_FOR_CHANNEL
+    - SIMILAR_TO
+  distributor:
+    - HAS_PORTFOLIO
+    - LOCATED_IN
+    - OPERATES_IN
+    - DISTRIBUTES_CATEGORY
+    - HANDLES_CHANNEL
+    - CAN_HANDLE
+    - GOOD_FOR
+  seller:
+    - HAS_PORTFOLIO
+    - SELLS_ON
+    - STRONG_IN
+    - TARGETS
+    - FOLLOWS_TREND
+    - HAS_CONTENT_STYLE
+    - GOOD_FOR
+    - WEAK_IN
+  trade:
+    - MATCHED_WITH
+    - TESTED_WITH
+    - CONVERTED_TO_CONTRACT
+    - FAILED_BECAUSE
+    - GENERATED_REORDER
+
+metadata:
+  required:
+    - source_id
+    - source_type
+    - collected_at
+    - confidence_level
+  optional:
+    - source_url
+    - verified_at
+    - valid_until
+    - updated_by

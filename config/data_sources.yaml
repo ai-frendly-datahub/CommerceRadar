@@ -1,0 +1,81 @@
+sources:
+  manufacturer_websites:
+    priority: 1
+    type: public_web
+    purpose: product_specs_and_catalogs
+    fields:
+      - product_name
+      - description
+      - specs
+      - images
+      - certifications
+      - oem_odm
+      - moq
+      - lead_time
+    collection_policy:
+      - check_robots_txt
+      - check_sitemap
+      - rate_limit_requests
+      - store_source_url
+
+  korea_factory_registration:
+    priority: 1
+    type: public_api
+    purpose: manufacturer_candidate_discovery
+    provider: Korea Industrial Complex Corporation / data.go.kr
+
+  korea_ecommerce_business_registration:
+    priority: 1
+    type: public_api
+    purpose: seller_candidate_discovery
+    provider: Korea Fair Trade Commission / data.go.kr
+
+  naver_datalab:
+    priority: 1
+    type: api
+    purpose: korea_search_and_shopping_trend
+    provider: NAVER Developers
+
+  kosis:
+    priority: 1
+    type: public_api
+    purpose: korea_statistics_online_shopping_crossborder
+    provider: KOSIS
+
+  customs_trade_statistics:
+    priority: 1
+    type: public_api
+    purpose: hs_code_trade_flow
+    provider: Korea Customs Service / Japan MOF / China Customs / UN Comtrade
+
+  rakuten_web_service:
+    priority: 1
+    type: api
+    purpose: japan_product_price_ranking_review
+    provider: Rakuten Web Service
+
+  xiaohongshu_open_platform:
+    priority: 3
+    type: permissioned_api
+    purpose: china_content_and_commerce_signal
+    provider: Xiaohongshu
+
+  douyin_open_platform:
+    priority: 3
+    type: permissioned_api
+    purpose: china_shortform_and_live_commerce_signal
+    provider: Douyin
+
+  flomers_internal_transactions:
+    priority: 0
+    type: first_party
+    purpose: validated_trade_outcomes
+    fields:
+      - match_id
+      - test_result
+      - order_count
+      - revenue
+      - returns
+      - cs_issues
+      - contract_conversion
+      - reorder

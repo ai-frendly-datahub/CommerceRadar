@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MatchCandidate",
+  "type": "object",
+  "required": ["id", "manufacturer_id", "product_id", "distributor_id", "seller_id", "target_country"],
+  "properties": {
+    "id": {"type": "string"},
+    "manufacturer_id": {"type": "string"},
+    "product_id": {"type": "string"},
+    "distributor_id": {"type": "string"},
+    "seller_id": {"type": "string"},
+    "target_country": {"type": "string"},
+    "target_channels": {"type": "array", "items": {"type": "string"}},
+    "score": {"type": "number"},
+    "recommendation_level": {"type": "string"},
+    "reasons": {"type": "array", "items": {"type": "string"}},
+    "risks": {"type": "array", "items": {"type": "string"}},
+    "next_actions": {"type": "array", "items": {"type": "string"}}
+  }
+}

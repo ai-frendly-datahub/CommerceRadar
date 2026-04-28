@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Product",
+  "type": "object",
+  "required": ["id", "manufacturer_id", "name", "category"],
+  "properties": {
+    "id": {"type": "string"},
+    "manufacturer_id": {"type": "string"},
+    "name": {"type": "string"},
+    "category": {"type": "string"},
+    "description": {"type": "string"},
+    "specs": {
+      "type": "object",
+      "properties": {
+        "size": {"type": "string"},
+        "capacity": {"type": "string"},
+        "weight": {"type": "string"},
+        "material": {"type": "string"},
+        "ingredients": {"type": "string"},
+        "package_type": {"type": "string"}
+      }
+    },
+    "features": {"type": "array", "items": {"type": "string"}},
+    "keywords": {"type": "array", "items": {"type": "string"}},
+    "suitable_channels": {"type": "array", "items": {"type": "string"}},
+    "suitable_countries": {"type": "array", "items": {"type": "string"}},
+    "risks": {"type": "array", "items": {"type": "string"}},
+    "moq": {"type": ["integer", "null"]},
+    "cost": {"type": ["number", "null"]},
+    "suggested_price": {"type": ["number", "null"]},
+    "source_urls": {"type": "array", "items": {"type": "string"}}
+  }
+}

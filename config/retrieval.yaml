@@ -1,0 +1,45 @@
+version: 0.2
+retrieval_modes:
+  keyword:
+    weight: 0.20
+    use_for:
+      - exact_company_name
+      - business_identifier
+      - product_name
+      - hs_code
+  vector:
+    weight: 0.25
+    use_for:
+      - semantic_product_fit
+      - similar_portfolio
+      - trend_similarity
+      - review_keyword_similarity
+  graph:
+    weight: 0.35
+    use_for:
+      - manufacturer_product_distributor_seller_paths
+      - evidence_chains
+      - prior_transaction_patterns
+  evidence:
+    weight: 0.20
+    use_for:
+      - source_confidence
+      - freshness
+      - validated_transaction_results
+
+query_intents:
+  find_company:
+    required_entities: [country, category]
+    output: company_list
+  evaluate_product:
+    required_entities: [product, target_country]
+    output: product_fit_report
+  recommend_combo:
+    required_entities: [product_or_category, target_country, channel]
+    output: combo_cards
+  analyze_failure:
+    required_entities: [transaction_or_match]
+    output: failure_analysis
+  discover_opportunity:
+    required_entities: [country, category_or_trend]
+    output: opportunity_report
