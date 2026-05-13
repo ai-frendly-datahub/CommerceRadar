@@ -1,0 +1,91 @@
+name: Radar Crawler (Commerce)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 18 * * *"  # Daily at 18:30 UTC (avoid 0~17 cron cluster)
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  RADAR_CATEGORY: commerce
+  TZ: Asia/Seoul
+  PYTHON_VERSION: "3.11"
+
+concurrency:
+  group: radar-collection
+  cancel-in-progress: false
+
+jobs:
+  run-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "radar-core @ git+https://github.com/ai-frendly-datahub/radar-core.git@v0.3.2"
+          pip install -e .[dev]
+
+      - name: Run Radar
+        run: |
+          python main.py --category "${{ env.RADAR_CATEGORY }}"
+
+      - name: Run Quality Checks
+        if: always()
+        run: |
+          python scripts/check_quality.py > quality_report.txt 2>&1 || true
+          cat quality_report.txt >> $GITHUB_STEP_SUMMARY
+        continue-on-error: true
+
+      - name: Auto-commit data updates
+        continue-on-error: true
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update commerce radar data [skip ci]"
+          file_pattern: "reports/*_summary.json reports/commerce_*.html reports/index.html reports/commerce_quality.json"
+          skip_fetch: false
+          skip_checkout: false
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./reports
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+          commit_message: "docs: update commerce radar report"
+
+      - name: Archive reports (30-day backup)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commerce-reports-${{ github.run_number }}
+          path: reports/
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Create workflow summary
+        if: always()
+        run: |
+          echo "## 📊 CommerceRadar Collection Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Category**: ${{ env.RADAR_CATEGORY }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          if [ -f "reports/index.html" ]; then
+            echo "✅ Report generated successfully" >> $GITHUB_STEP_SUMMARY
+          fi

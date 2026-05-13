@@ -1,0 +1,39 @@
+name: Health Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"  # Daily at 06:00 UTC
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "radar-core @ git+https://github.com/ai-frendly-datahub/radar-core.git@v0.3.2"
+          pip install -e .[dev]
+
+      - name: Smoke test
+        run: |
+          python main.py --category commerce
+          test -f reports/index.html
+
+      - name: Run unit tests
+        run: pytest tests/unit -q

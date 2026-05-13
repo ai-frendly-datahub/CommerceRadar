@@ -1,0 +1,71 @@
+category_name: commerce
+display_name: Commerce KG Radar
+
+# CommerceRadar's "sources" are local KG sample feeds, not network endpoints.
+sources:
+  - id: commerce_kg_trends
+    name: Flomers Commerce KG Trends
+    type: jsonl
+    url: local://commerce/trends
+    enabled: true
+    language: ko
+    country: KR
+    trust_tier: T2_expert
+    weight: 1.0
+    content_type: trend
+    collection_tier: C4_api
+    producer_role: research_inst
+  - id: commerce_kg_manufacturers
+    name: Flomers Commerce KG Manufacturers
+    type: jsonl
+    url: local://commerce/manufacturers
+    enabled: true
+    language: ko
+    country: KR
+    trust_tier: T2_expert
+    weight: 1.0
+    content_type: directory
+    collection_tier: C4_api
+    producer_role: research_inst
+
+entities:
+  - name: Manufacturer
+    display_name: 제조사
+    keywords:
+      - 제조사
+      - 메이커
+      - manufacturer
+      - factory
+  - name: Distributor
+    display_name: 유통사
+    keywords:
+      - 유통사
+      - distributor
+      - wholesale
+  - name: Seller
+    display_name: 판매사
+    keywords:
+      - 판매사
+      - seller
+      - retailer
+  - name: Product
+    display_name: 제품
+    keywords:
+      - 제품
+      - product
+      - sku
+  - name: Channel
+    display_name: 채널
+    keywords:
+      - rakuten
+      - base
+      - instagram
+      - shopify
+      - smartstore
+  - name: Country
+    display_name: 국가
+    keywords:
+      - KR
+      - JP
+      - CN
+      - US

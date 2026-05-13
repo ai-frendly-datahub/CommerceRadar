@@ -17,8 +17,10 @@ dependencies = [
 dev = ["pytest>=8.0.0"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 testpaths = ["tests"]
+markers = ["unit: unit-scope tests"]
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = [".", "src"]
+include = ["commerceradar*", "flomers_kg*"]

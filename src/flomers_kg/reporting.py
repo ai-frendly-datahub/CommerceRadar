@@ -96,6 +96,7 @@ def build_report_payload(root: Path, report_date: date | None = None) -> dict[st
         "matched_count": len(matched_cards),
         "source_count": _enabled_source_count(root / "config" / "sources.yaml"),
         "top_entities": _top_entities(cards),
+        "sources": _sources_distribution(cards),
         "warnings": _report_warnings(cards),
         "cards": cards,
     }
@@ -268,6 +269,16 @@ def _top_entities(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for value in card.get("entities", {}).values():
             counter[str(value)] += 1
     return [{"name": name, "count": count} for name, count in counter.most_common(5)]
+
+
+def _sources_distribution(cards: list[dict[str, Any]]) -> dict[str, int]:
+    counter: Counter[str] = Counter()
+    for card in cards:
+        entities = card.get("entities") or {}
+        distributor_name = entities.get("distributor")
+        if distributor_name:
+            counter[str(distributor_name)] += 1
+    return dict(counter)
 
 
 def _report_warnings(cards: list[dict[str, Any]]) -> list[str]:
