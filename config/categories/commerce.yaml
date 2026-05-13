@@ -69,3 +69,108 @@ entities:
       - JP
       - CN
       - US
+
+data_quality:
+  priority: P2
+  primary_motion: intelligence
+  weakest_dimension: traceability
+  quality_outputs:
+    freshness_report: reports/commerce_quality.json
+    dated_freshness_report_pattern: reports/commerce_YYYYMMDD_quality.json
+    tracked_event_models:
+      - trend_signal
+      - match_candidate
+      - manufacturer_profile
+      - distributor_profile
+      - seller_profile
+      - product_listing
+  event_models:
+    trend_signal:
+      date_fields:
+        - collected_at
+      required_fields:
+        - trend_name
+        - country
+        - source_url
+    match_candidate:
+      date_fields:
+        - generated_at
+        - collected_at
+      required_fields:
+        - manufacturer_id
+        - product_id
+        - distributor_id
+        - seller_id
+        - source_url
+    manufacturer_profile:
+      date_fields:
+        - verified_at
+        - collected_at
+      required_fields:
+        - manufacturer_id
+        - country
+        - source_url
+    distributor_profile:
+      date_fields:
+        - verified_at
+        - collected_at
+      required_fields:
+        - distributor_id
+        - country
+        - source_url
+    seller_profile:
+      date_fields:
+        - verified_at
+        - collected_at
+      required_fields:
+        - seller_id
+        - country
+        - source_url
+    product_listing:
+      date_fields:
+        - listed_at
+        - collected_at
+      required_fields:
+        - product_id
+        - manufacturer_id
+        - source_url
+  canonical_keys:
+    manufacturer:
+      - country
+      - manufacturer_id
+    product:
+      - manufacturer_id
+      - product_id
+    match:
+      - manufacturer_id
+      - product_id
+      - distributor_id
+      - seller_id
+  freshness_sla:
+    trend_signal_days: 7
+    match_candidate_days: 14
+    manufacturer_profile_days: 30
+    distributor_profile_days: 30
+    seller_profile_days: 30
+    product_listing_days: 14
+  quality_gates:
+    - KG sample seed 와 실 수집기 (production) 출처를 source_type 으로 분리한다
+    - manufacturer/product/distributor/seller canonical key 충돌은 country 로 구분한다
+    - match candidate 점수는 evidence_ids 가 있을 때만 production 으로 분류한다
+    - trend signal 의 country/channel/category 는 ISO 또는 알려진 enum 만 사용
+
+source_backlog:
+  operational_candidates:
+    - id: flomers_commerce_kg_trends
+      name: Flomers Commerce KG Trends (sample)
+      signal_type: trend_signal
+      activation_gate: production-grade trend collector replacing sample seed
+    - id: flomers_commerce_kg_manufacturers
+      name: Flomers Commerce KG Manufacturers (sample)
+      signal_type: manufacturer_profile
+      activation_gate: production-grade manufacturer directory replacing sample seed
+  accepted_backlog:
+    - id: kpop_commerce_partner_directory
+      name: K-pop commerce partner directory (placeholder)
+      signal_type: distributor_profile
+      reason: waiting for upstream commerce partner data feed

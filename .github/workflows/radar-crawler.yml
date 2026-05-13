@@ -41,7 +41,7 @@ jobs:
 
       - name: Run Radar
         run: |
-          python main.py --category "${{ env.RADAR_CATEGORY }}"
+          python main.py --category "${{ env.RADAR_CATEGORY }}" --snapshot-db --keep-days 90 --keep-raw-days 90 --keep-report-days 90
 
       - name: Run Quality Checks
         if: always()
