@@ -1,6 +1,6 @@
 {
   "category": "commerce",
-  "generated_at": "2026-05-14T07:45:40.818900+00:00",
+  "generated_at": "2026-05-14T20:11:35.656468+00:00",
   "sources_enabled": 8,
   "sources_fresh": 2,
   "collection_errors": 0,
@@ -10,5 +10,5 @@
   },
   "daily_review_items": 0,
   "warnings": [],
-  "summary_file": "commerce_20260514_summary.json"
+  "summary_file": "commerce_20260515_summary.json"
 }
