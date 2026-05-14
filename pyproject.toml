@@ -7,9 +7,10 @@ name = "flomers-commerce-kg"
 version = "0.2.0"
 description = "Flomers B2B commerce contextual knowledge graph and matching engine prototype"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [{name = "Flomers"}]
 dependencies = [
+  "radar-core @ git+https://github.com/ai-frendly-datahub/radar-core.git@v0.3.2",
   "pyyaml>=6.0.0",
 ]
 
