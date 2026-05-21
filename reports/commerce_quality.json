@@ -1,6 +1,6 @@
 {
   "category": "commerce",
-  "generated_at": "2026-05-21T08:29:19.143319+00:00",
+  "generated_at": "2026-05-21T20:16:44.688937+00:00",
   "sources_enabled": 8,
   "sources_fresh": 3,
   "collection_errors": 0,
@@ -11,7 +11,7 @@
   "daily_review_items": 0,
   "pending_evidence_items": 0,
   "warnings": [],
-  "summary_file": "commerce_20260521_summary.json",
+  "summary_file": "commerce_20260522_summary.json",
   "data_quality_checks": {
     "row_counts": {
       "manufacturers": 2,
