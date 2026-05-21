@@ -52,11 +52,14 @@ def build_report_payload(root: Path, report_date: date | None = None) -> dict[st
                     evidence_rows,
                     [manufacturer.id, product.id, distributor.id, seller.id],
                 )
+                evidence_status = "supported"
                 if not evidence_ids:
                     evidence_ids = [
                         "evidence_pending::"
                         f"{manufacturer.id}::{product.id}::{distributor.id}::{seller.id}"
                     ]
+                    evidence_status = "pending"
+                evidence_confidence = _average_evidence_confidence(evidence_rows, evidence_ids)
                 score = score_advanced_match(
                     manufacturer=manufacturer,
                     product=product,
@@ -65,7 +68,7 @@ def build_report_payload(root: Path, report_date: date | None = None) -> dict[st
                     trends=trends,
                     target_country=target_country,
                     target_channels=target_channels,
-                    evidence_confidence=_average_evidence_confidence(evidence_rows, evidence_ids),
+                    evidence_confidence=evidence_confidence,
                     market_growth_signal=_market_growth_signal(trends, product.category, target_country),
                     staleness=0.05,
                 )
@@ -82,11 +85,14 @@ def build_report_payload(root: Path, report_date: date | None = None) -> dict[st
                 card["id"] = (
                     f"match::{manufacturer.id}::{product.id}::{distributor.id}::{seller.id}"
                 )
+                card["evidence_status"] = evidence_status
                 card["transaction_status"] = _transaction_status(transaction_rows, card["id"])
                 cards.append(card)
 
     cards.sort(key=lambda item: (-float(item["score"]), str(item["title"])))
     matched_cards = [card for card in cards if float(card["score"]) >= 70.0]
+    source_distribution = _sources_distribution(evidence_rows, cards)
+    evidence_status_counts = Counter(str(card.get("evidence_status") or "unknown") for card in cards)
 
     return {
         "category": "commerce",
@@ -95,8 +101,12 @@ def build_report_payload(root: Path, report_date: date | None = None) -> dict[st
         "article_count": len(cards),
         "matched_count": len(matched_cards),
         "source_count": _enabled_source_count(root / "config" / "sources.yaml"),
+        "collected_source_count": len(source_distribution),
+        "supported_evidence_count": evidence_status_counts.get("supported", 0),
+        "pending_evidence_count": evidence_status_counts.get("pending", 0),
         "top_entities": _top_entities(cards),
-        "sources": _sources_distribution(cards),
+        "sources": source_distribution,
+        "distributor_distribution": _distributor_distribution(cards),
         "warnings": _report_warnings(cards),
         "cards": cards,
     }
@@ -230,13 +240,15 @@ def _evidence_ids(rows: list[dict[str, Any]], entity_ids: list[str]) -> list[str
 
 
 def _average_evidence_confidence(rows: list[dict[str, Any]], evidence_ids: list[str]) -> float:
+    if not evidence_ids or all(str(evidence_id).startswith("evidence_pending::") for evidence_id in evidence_ids):
+        return 0.0
     wanted = set(evidence_ids)
     values = [
         float(row.get("confidence", 0.0))
         for row in rows
         if row.get("id") in wanted and isinstance(row.get("confidence"), (int, float))
     ]
-    return round(sum(values) / len(values), 2) if values else 0.5
+    return round(sum(values) / len(values), 2) if values else 0.0
 
 
 def _market_growth_signal(trends: list[Any], category: str, country: str) -> float:
@@ -271,7 +283,24 @@ def _top_entities(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [{"name": name, "count": count} for name, count in counter.most_common(5)]
 
 
-def _sources_distribution(cards: list[dict[str, Any]]) -> dict[str, int]:
+def _sources_distribution(rows: list[dict[str, Any]], cards: list[dict[str, Any]]) -> dict[str, int]:
+    evidence_ids = {
+        evidence_id
+        for card in cards
+        for evidence_id in card.get("evidence_ids", [])
+        if not str(evidence_id).startswith("evidence_pending::")
+    }
+    counter: Counter[str] = Counter()
+    for row in rows:
+        if row.get("id") not in evidence_ids:
+            continue
+        source_type = row.get("source_type")
+        if source_type:
+            counter[str(source_type)] += 1
+    return dict(counter)
+
+
+def _distributor_distribution(cards: list[dict[str, Any]]) -> dict[str, int]:
     counter: Counter[str] = Counter()
     for card in cards:
         entities = card.get("entities") or {}

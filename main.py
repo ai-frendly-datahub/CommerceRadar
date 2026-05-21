@@ -48,6 +48,7 @@ def main() -> int:
         snapshot_db=args.snapshot_db,
         keep_raw_days=args.keep_raw_days,
         keep_report_days=args.keep_report_days,
+        keep_snapshot_days=args.keep_days,
     )
     report_paths = generate_report(project_root=PROJECT_ROOT)
     quality_path = write_quality_report(PROJECT_ROOT)
@@ -59,6 +60,8 @@ def main() -> int:
     if storage_result.get("snapshot_path"):
         print(f"snapshot: {storage_result['snapshot_path'].relative_to(PROJECT_ROOT)}")
     print(f"raw_pruned: {storage_result.get('raw_pruned', 0)}")
+    print(f"report_pruned: {storage_result.get('report_pruned', 0)}")
+    print(f"snapshot_pruned: {storage_result.get('snapshot_pruned', 0)}")
     print(f"report: {report_paths['report'].relative_to(PROJECT_ROOT)}")
     print(f"summary: {report_paths['summary'].relative_to(PROJECT_ROOT)}")
     print(f"index: {report_paths['index'].relative_to(PROJECT_ROOT)}")

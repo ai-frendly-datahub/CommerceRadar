@@ -15,8 +15,25 @@ def test_build_report_payload_generates_dashboard_summary_fields():
     assert payload["article_count"] >= 1
     assert payload["matched_count"] <= payload["article_count"]
     assert payload["source_count"] == 8
+    assert payload["collected_source_count"] >= 1
+    assert payload["supported_evidence_count"] == payload["article_count"]
+    assert payload["pending_evidence_count"] == 0
+    assert "sample_product_page" in payload["sources"]
     assert payload["top_entities"]
     assert payload["warnings"] == []
+
+
+def test_report_payload_has_no_pending_evidence_for_repository_samples():
+    payload = build_report_payload(ROOT, report_date=date(2026, 4, 28))
+    pending_cards = [
+        card
+        for card in payload["cards"]
+        if any(str(evidence_id).startswith("evidence_pending::") for evidence_id in card["evidence_ids"])
+    ]
+
+    assert pending_cards == []
+    assert all(card["evidence_status"] == "supported" for card in payload["cards"])
+    assert all(card["breakdown"]["evidence_confidence"] > 0.0 for card in payload["cards"])
 
 
 def test_write_report_artifacts_outputs_summary_report_and_index(tmp_path):

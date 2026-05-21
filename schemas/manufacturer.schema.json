@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Manufacturer",
   "type": "object",
-  "required": ["id", "name", "country", "source_urls"],
+  "required": ["id", "name", "country", "source"],
   "properties": {
     "id": {"type": "string"},
     "name": {"type": "string"},
@@ -17,6 +17,17 @@
     "export_experience": {"type": "array", "items": {"type": "string"}},
     "response_score": {"type": ["number", "null"]},
     "trust_level": {"type": "integer", "minimum": 1, "maximum": 7},
-    "source_urls": {"type": "array", "items": {"type": "string"}}
+    "source_urls": {"type": "array", "items": {"type": "string"}},
+    "source": {
+      "type": "object",
+      "required": ["source_type", "source_urls"],
+      "properties": {
+        "source_type": {"type": "string"},
+        "source_urls": {"type": "array", "items": {"type": "string"}},
+        "confidence_level": {"type": "integer", "minimum": 1, "maximum": 7},
+        "collected_at": {"type": ["string", "null"]},
+        "verified_at": {"type": ["string", "null"]}
+      }
+    }
   }
 }

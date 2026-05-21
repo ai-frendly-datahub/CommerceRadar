@@ -4,6 +4,10 @@ from .models import Distributor, Manufacturer, Product, Seller, Trend
 from .scoring import score_match
 
 
+def _overlaps(a: list[str], b: list[str]) -> bool:
+    return bool({item.lower() for item in a} & {item.lower() for item in b})
+
+
 def contextual_match_search(
     manufacturers: list[Manufacturer],
     products: list[Product],
@@ -38,8 +42,24 @@ def contextual_match_search(
         for distributor in distributors:
             if distributor.country != target_country:
                 continue
+            if product.category not in distributor.portfolio_categories:
+                continue
+            if (
+                target_channels
+                and distributor.distribution_channels
+                and not _overlaps(target_channels, distributor.distribution_channels)
+            ):
+                continue
             for seller in sellers:
                 if seller.country != target_country:
+                    continue
+                if product.category not in seller.categories:
+                    continue
+                if (
+                    target_channels
+                    and seller.channels
+                    and not _overlaps(target_channels, seller.channels)
+                ):
                     continue
                 candidate = score_match(
                     manufacturer=manufacturer,

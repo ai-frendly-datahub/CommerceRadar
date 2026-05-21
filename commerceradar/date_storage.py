@@ -10,12 +10,12 @@ the repo uniformly.
 
 from __future__ import annotations
 
+import re
 import shutil
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 from radar_core.date_storage import (
-    apply_date_storage_policy as _core_apply_date_storage_policy,
     cleanup_date_directories,
     snapshot_database,
 )
@@ -47,6 +47,37 @@ def materialize_kg_raw_snapshot(
     return raw_dir if written else None
 
 
+def _parse_date_token(value: str) -> date | None:
+    for match in re.finditer(r"\d{4}-\d{2}-\d{2}|\d{8}", value):
+        token = match.group(0)
+        if len(token) == 8:
+            try:
+                return datetime.strptime(token, "%Y%m%d").date()
+            except ValueError:
+                continue
+        try:
+            return date.fromisoformat(token)
+        except ValueError:
+            continue
+    return None
+
+
+def cleanup_dated_files(path: Path, *, keep_days: int, today: date | None = None) -> int:
+    if not path.exists() or keep_days < 0:
+        return 0
+    cutoff = (today or datetime.now(UTC).date()) - timedelta(days=keep_days)
+    removed = 0
+    for item in path.iterdir():
+        if not item.is_file():
+            continue
+        item_date = _parse_date_token(item.name)
+        if item_date is None or item_date >= cutoff:
+            continue
+        item.unlink()
+        removed += 1
+    return removed
+
+
 def apply_date_storage_policy(
     project_root: Path,
     *,
@@ -61,6 +92,7 @@ def apply_date_storage_policy(
     database_path = project_root / "data" / "radar_data.duckdb"
     raw_data_dir = project_root / "data" / "raw"
     report_dir = project_root / "reports"
+    snapshot_dir = project_root / "data" / "daily"
     snapshot_path: Path | None = None
     if snapshot_db and database_path.exists():
         snapshot_path = snapshot_database(
@@ -68,16 +100,21 @@ def apply_date_storage_policy(
             snapshot_date=snapshot_date,
             snapshot_root=project_root / "data" / "daily",
         )
-    raw_pruned = cleanup_date_directories(raw_data_dir, keep_days=keep_raw_days)
+    raw_pruned = cleanup_date_directories(raw_data_dir, keep_days=keep_raw_days, today=snapshot_date)
+    report_pruned = cleanup_dated_files(report_dir, keep_days=keep_report_days, today=snapshot_date)
+    snapshot_pruned = cleanup_dated_files(snapshot_dir, keep_days=keep_snapshot_days, today=snapshot_date)
     return {
         "raw_dir_created": raw_dir,
         "snapshot_path": snapshot_path,
         "raw_pruned": raw_pruned,
+        "report_pruned": report_pruned,
+        "snapshot_pruned": snapshot_pruned,
     }
 
 
 __all__ = [
     "apply_date_storage_policy",
+    "cleanup_dated_files",
     "cleanup_date_directories",
     "materialize_kg_raw_snapshot",
     "snapshot_database",

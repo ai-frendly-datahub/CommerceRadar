@@ -11,6 +11,7 @@ requires-python = ">=3.11"
 authors = [{name = "Flomers"}]
 dependencies = [
   "radar-core @ git+https://github.com/ai-frendly-datahub/radar-core.git@v0.3.2",
+  "jsonschema>=4.0.0",
   "pyyaml>=6.0.0",
 ]
 

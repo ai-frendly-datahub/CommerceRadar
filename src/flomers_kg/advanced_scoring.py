@@ -120,11 +120,6 @@ def score_advanced_match(
         execution += 1.5
     execution = _bounded(execution, 8)
 
-    evidence_score = _bounded(8 * evidence_confidence, 8)
-    if evidence_score < 4:
-        risks.append("추천 근거의 신뢰도가 낮습니다.")
-
-    risk_penalty = 0.0
     risk_map = {
         "certification_required": 6,
         "customs_complexity": 5,
@@ -133,7 +128,17 @@ def score_advanced_match(
         "high_shipping_cost": 6,
         "liquid_shipping": 4,
         "high_return_risk": 5,
+        "insufficient_evidence": 8,
     }
+
+    evidence_score = _bounded(8 * evidence_confidence, 8)
+    risk_penalty = 0.0
+    if evidence_confidence <= 0:
+        risk_penalty += risk_map["insufficient_evidence"]
+        risks.append("추천 근거 evidence가 아직 연결되지 않았습니다.")
+    elif evidence_score < 4:
+        risks.append("추천 근거의 신뢰도가 낮습니다.")
+
     for risk in product.risks:
         penalty = risk_map.get(risk.lower(), 2)
         risk_penalty += penalty
@@ -169,6 +174,8 @@ def score_advanced_match(
         rec = "보류"
     else:
         rec = "비추천"
+    if evidence_confidence <= 0 and rec in {"강력 추천", "추천"}:
+        rec = "조건부 테스트"
 
     return AdvancedScoreBreakdown(
         product_fit=round(product_fit, 1),

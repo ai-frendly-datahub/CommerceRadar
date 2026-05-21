@@ -2,7 +2,19 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "ComboCard",
   "type": "object",
-  "required": ["title", "score", "recommendation", "entities", "reasons", "risks", "next_actions"],
+  "required": [
+    "title",
+    "score",
+    "recommendation",
+    "entities",
+    "target_country",
+    "target_channels",
+    "reasons",
+    "risks",
+    "next_actions",
+    "evidence_ids",
+    "breakdown"
+  ],
   "properties": {
     "title": {"type": "string"},
     "score": {"type": "number"},
@@ -13,6 +25,34 @@
     "reasons": {"type": "array", "items": {"type": "string"}},
     "risks": {"type": "array", "items": {"type": "string"}},
     "next_actions": {"type": "array", "items": {"type": "string"}},
-    "evidence_ids": {"type": "array", "items": {"type": "string"}}
+    "evidence_ids": {"type": "array", "items": {"type": "string"}},
+    "evidence_status": {"type": "string", "enum": ["supported", "pending"]},
+    "breakdown": {
+      "type": "object",
+      "required": [
+        "product_fit",
+        "distributor_fit",
+        "seller_fit",
+        "trend_fit",
+        "market_potential",
+        "economics",
+        "execution_feasibility",
+        "evidence_confidence",
+        "risk_penalty",
+        "staleness_penalty"
+      ],
+      "properties": {
+        "product_fit": {"type": "number"},
+        "distributor_fit": {"type": "number"},
+        "seller_fit": {"type": "number"},
+        "trend_fit": {"type": "number"},
+        "market_potential": {"type": "number"},
+        "economics": {"type": "number"},
+        "execution_feasibility": {"type": "number"},
+        "evidence_confidence": {"type": "number"},
+        "risk_penalty": {"type": "number"},
+        "staleness_penalty": {"type": "number"}
+      }
+    }
   }
 }

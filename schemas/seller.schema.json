@@ -17,6 +17,17 @@
     "trend_keywords": {"type": "array", "items": {"type": "string"}},
     "review_keywords": {"type": "array", "items": {"type": "string"}},
     "commerce_capabilities": {"type": "array", "items": {"type": "string"}},
-    "source_urls": {"type": "array", "items": {"type": "string"}}
+    "source_urls": {"type": "array", "items": {"type": "string"}},
+    "source": {
+      "type": "object",
+      "required": ["source_type", "source_urls"],
+      "properties": {
+        "source_type": {"type": "string"},
+        "source_urls": {"type": "array", "items": {"type": "string"}},
+        "confidence_level": {"type": "integer", "minimum": 1, "maximum": 7},
+        "collected_at": {"type": ["string", "null"]},
+        "verified_at": {"type": ["string", "null"]}
+      }
+    }
   }
 }
