@@ -1,6 +1,6 @@
 {
   "category": "commerce",
-  "generated_at": "2026-05-22T20:16:26.689717+00:00",
+  "generated_at": "2026-05-23T19:42:19.579830+00:00",
   "sources_enabled": 8,
   "sources_fresh": 3,
   "collection_errors": 0,
@@ -11,7 +11,7 @@
   "daily_review_items": 0,
   "pending_evidence_items": 0,
   "warnings": [],
-  "summary_file": "commerce_20260523_summary.json",
+  "summary_file": "commerce_20260524_summary.json",
   "data_quality_checks": {
     "row_counts": {
       "manufacturers": 2,
@@ -30,7 +30,7 @@
     "missing_source_dates": [],
     "reference_error_count": 0,
     "reference_errors": [],
-    "raw_trend_log": "data/raw/2026-05-22/commerce_kg_trends.jsonl",
+    "raw_trend_log": "data/raw/2026-05-23/commerce_kg_trends.jsonl",
     "raw_trend_rows": 2,
     "raw_trend_duplicate_link_count": 0,
     "raw_trend_missing_kg_id_count": 0,
@@ -38,22 +38,22 @@
     "raw_trend_missing_source_observed_at_count": 0,
     "raw_trend_average_extraction_quality": 100.0,
     "average_quality_by_kind": {
-      "manufacturers": 72.85,
-      "products": 71.07,
-      "distributors": 71.07,
-      "sellers": 71.07,
-      "trends": 71.07,
-      "evidence": 74.28,
-      "transactions": 75.42
+      "manufacturers": 72.63,
+      "products": 70.85,
+      "distributors": 70.85,
+      "sellers": 70.85,
+      "trends": 70.85,
+      "evidence": 74.06,
+      "transactions": 75.19
     },
     "minimum_quality_by_kind": {
-      "manufacturers": 71.07,
-      "products": 71.07,
-      "distributors": 71.07,
-      "sellers": 71.07,
-      "trends": 71.07,
-      "evidence": 71.17,
-      "transactions": 75.42
+      "manufacturers": 70.85,
+      "products": 70.85,
+      "distributors": 70.85,
+      "sellers": 70.85,
+      "trends": 70.85,
+      "evidence": 70.94,
+      "transactions": 75.19
     },
     "low_quality_group_count": 0,
     "low_quality_groups": [],
