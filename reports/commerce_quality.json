@@ -1,6 +1,6 @@
 {
   "category": "commerce",
-  "generated_at": "2026-06-05T20:20:36.400588+00:00",
+  "generated_at": "2026-06-06T19:50:59.654281+00:00",
   "sources_enabled": 8,
   "sources_fresh": 3,
   "collection_errors": 0,
@@ -11,9 +11,10 @@
   "daily_review_items": 0,
   "pending_evidence_items": 0,
   "warnings": [
-    "sample quality score below threshold"
+    "sample quality score below threshold",
+    "evidence records are expired or expiring soon"
   ],
-  "summary_file": "commerce_20260606_summary.json",
+  "summary_file": "commerce_20260607_summary.json",
   "data_quality_checks": {
     "row_counts": {
       "manufacturers": 2,
@@ -32,7 +33,7 @@
     "missing_source_dates": [],
     "reference_error_count": 0,
     "reference_errors": [],
-    "raw_trend_log": "data/raw/2026-06-05/commerce_kg_trends.jsonl",
+    "raw_trend_log": "data/raw/2026-06-06/commerce_kg_trends.jsonl",
     "raw_trend_rows": 2,
     "raw_trend_duplicate_link_count": 0,
     "raw_trend_missing_kg_id_count": 0,
@@ -40,48 +41,51 @@
     "raw_trend_missing_source_observed_at_count": 0,
     "raw_trend_average_extraction_quality": 100.0,
     "average_quality_by_kind": {
-      "manufacturers": 69.75,
-      "products": 67.96,
-      "distributors": 67.96,
-      "sellers": 67.96,
-      "trends": 67.96,
-      "evidence": 71.18,
-      "transactions": 72.31
+      "manufacturers": 69.52,
+      "products": 67.73,
+      "distributors": 67.73,
+      "sellers": 67.73,
+      "trends": 67.73,
+      "evidence": 70.94,
+      "transactions": 72.08
     },
     "minimum_quality_by_kind": {
-      "manufacturers": 67.96,
-      "products": 67.96,
-      "distributors": 67.96,
-      "sellers": 67.96,
-      "trends": 67.96,
-      "evidence": 68.06,
-      "transactions": 72.31
+      "manufacturers": 67.73,
+      "products": 67.73,
+      "distributors": 67.73,
+      "sellers": 67.73,
+      "trends": 67.73,
+      "evidence": 67.83,
+      "transactions": 72.08
     },
     "low_quality_group_count": 5,
     "low_quality_groups": [
       {
         "kind": "manufacturers",
-        "average_score": 69.75
+        "average_score": 69.52
       },
       {
         "kind": "products",
-        "average_score": 67.96
+        "average_score": 67.73
       },
       {
         "kind": "distributors",
-        "average_score": 67.96
+        "average_score": 67.73
       },
       {
         "kind": "sellers",
-        "average_score": 67.96
+        "average_score": 67.73
       },
       {
         "kind": "trends",
-        "average_score": 67.96
+        "average_score": 67.73
       }
     ],
-    "evidence_expiring_soon_count": 0,
-    "evidence_expiring_soon_ids": [],
+    "evidence_expiring_soon_count": 2,
+    "evidence_expiring_soon_ids": [
+      "ev_seller_reviews_001",
+      "ev_seller_reviews_002"
+    ],
     "evidence_expired_count": 0,
     "evidence_expired_ids": []
   }
