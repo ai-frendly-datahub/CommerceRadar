@@ -1,6 +1,6 @@
 {
   "category": "commerce",
-  "generated_at": "2026-06-26T20:14:51.488779+00:00",
+  "generated_at": "2026-06-27T19:49:52.889416+00:00",
   "sources_enabled": 8,
   "sources_fresh": 3,
   "collection_errors": 0,
@@ -14,7 +14,7 @@
     "sample quality score below threshold",
     "evidence records are expired or expiring soon"
   ],
-  "summary_file": "commerce_20260627_summary.json",
+  "summary_file": "commerce_20260628_summary.json",
   "data_quality_checks": {
     "row_counts": {
       "manufacturers": 2,
@@ -33,7 +33,7 @@
     "missing_source_dates": [],
     "reference_error_count": 0,
     "reference_errors": [],
-    "raw_trend_log": "data/raw/2026-06-26/commerce_kg_trends.jsonl",
+    "raw_trend_log": "data/raw/2026-06-27/commerce_kg_trends.jsonl",
     "raw_trend_rows": 2,
     "raw_trend_duplicate_link_count": 0,
     "raw_trend_missing_kg_id_count": 0,
@@ -41,52 +41,52 @@
     "raw_trend_missing_source_observed_at_count": 0,
     "raw_trend_average_extraction_quality": 100.0,
     "average_quality_by_kind": {
-      "manufacturers": 65.08,
-      "products": 63.29,
-      "distributors": 63.29,
-      "sellers": 63.29,
-      "trends": 63.29,
-      "evidence": 66.5,
-      "transactions": 67.64
+      "manufacturers": 64.86,
+      "products": 63.07,
+      "distributors": 63.07,
+      "sellers": 63.07,
+      "trends": 63.07,
+      "evidence": 66.28,
+      "transactions": 67.42
     },
     "minimum_quality_by_kind": {
-      "manufacturers": 63.29,
-      "products": 63.29,
-      "distributors": 63.29,
-      "sellers": 63.29,
-      "trends": 63.29,
-      "evidence": 63.39,
-      "transactions": 67.64
+      "manufacturers": 63.07,
+      "products": 63.07,
+      "distributors": 63.07,
+      "sellers": 63.07,
+      "trends": 63.07,
+      "evidence": 63.17,
+      "transactions": 67.42
     },
     "low_quality_group_count": 7,
     "low_quality_groups": [
       {
         "kind": "manufacturers",
-        "average_score": 65.08
+        "average_score": 64.86
       },
       {
         "kind": "products",
-        "average_score": 63.29
+        "average_score": 63.07
       },
       {
         "kind": "distributors",
-        "average_score": 63.29
+        "average_score": 63.07
       },
       {
         "kind": "sellers",
-        "average_score": 63.29
+        "average_score": 63.07
       },
       {
         "kind": "trends",
-        "average_score": 63.29
+        "average_score": 63.07
       },
       {
         "kind": "evidence",
-        "average_score": 66.5
+        "average_score": 66.28
       },
       {
         "kind": "transactions",
-        "average_score": 67.64
+        "average_score": 67.42
       }
     ],
     "evidence_expiring_soon_count": 0,
