@@ -1,0 +1,43 @@
+{
+  "category": "commerce",
+  "date": "2026-07-15",
+  "generated_at": "2026-07-14T19:49:18.095513+00:00",
+  "article_count": 2,
+  "matched_count": 2,
+  "source_count": 8,
+  "collected_source_count": 3,
+  "supported_evidence_count": 2,
+  "pending_evidence_count": 0,
+  "top_entities": [
+    {
+      "name": "ABC코스메틱",
+      "count": 1
+    },
+    {
+      "name": "노워시 퍼퓸 헤어오일",
+      "count": 1
+    },
+    {
+      "name": "Tokyo Beauty Distribution",
+      "count": 1
+    },
+    {
+      "name": "Tokyo Beauty Select",
+      "count": 1
+    },
+    {
+      "name": "서울리빙팩토리",
+      "count": 1
+    }
+  ],
+  "sources": {
+    "sample_product_page": 2,
+    "sample_distributor_page": 2,
+    "sample_seller_channel": 2
+  },
+  "distributor_distribution": {
+    "Tokyo Beauty Distribution": 1,
+    "Osaka Lifestyle Distribution": 1
+  },
+  "warnings": []
+}
