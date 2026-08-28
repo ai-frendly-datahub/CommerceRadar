@@ -1,6 +1,6 @@
 {
   "category": "commerce",
-  "generated_at": "2026-08-26T20:18:10.284993+00:00",
+  "generated_at": "2026-08-28T02:13:47.650212+00:00",
   "sources_enabled": 8,
   "sources_fresh": 3,
   "collection_errors": 0,
@@ -14,7 +14,7 @@
     "sample quality score below threshold",
     "evidence records are expired or expiring soon"
   ],
-  "summary_file": "commerce_20260827_summary.json",
+  "summary_file": "commerce_20260828_summary.json",
   "data_quality_checks": {
     "row_counts": {
       "manufacturers": 2,
@@ -33,7 +33,7 @@
     "missing_source_dates": [],
     "reference_error_count": 0,
     "reference_errors": [],
-    "raw_trend_log": "data/raw/2026-08-26/commerce_kg_trends.jsonl",
+    "raw_trend_log": "data/raw/2026-08-28/commerce_kg_trends.jsonl",
     "raw_trend_rows": 2,
     "raw_trend_duplicate_link_count": 0,
     "raw_trend_missing_kg_id_count": 0,
@@ -89,12 +89,11 @@
         "average_score": 60.75
       }
     ],
-    "evidence_expiring_soon_count": 1,
-    "evidence_expiring_soon_ids": [
-      "ev_distributor_portfolio_001"
-    ],
-    "evidence_expired_count": 5,
+    "evidence_expiring_soon_count": 0,
+    "evidence_expiring_soon_ids": [],
+    "evidence_expired_count": 6,
     "evidence_expired_ids": [
+      "ev_distributor_portfolio_001",
       "ev_distributor_portfolio_002",
       "ev_product_page_001",
       "ev_product_page_002",
