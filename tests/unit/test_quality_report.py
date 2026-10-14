@@ -202,7 +202,7 @@ def test_build_quality_report_includes_sample_quality_scores(tmp_path: Path) -> 
         encoding="utf-8",
     )
 
-    payload = build_quality_report(tmp_path)
+    payload = build_quality_report(tmp_path, today=date(2026, 5, 21))
     checks = payload["data_quality_checks"]
 
     assert checks["average_quality_by_kind"]["manufacturers"] >= 70
@@ -211,9 +211,15 @@ def test_build_quality_report_includes_sample_quality_scores(tmp_path: Path) -> 
 
 @pytest.mark.unit
 def test_repository_sample_quality_report_has_no_quality_warnings() -> None:
+    """Score the checked-in sample seed on its own observed date.
+
+    Sample rows are fixed fixtures (verified 2026-05-21). Freshness and
+    evidence expiry must not follow the wall clock, or the gate fails as
+    those dates age.
+    """
     root = Path(__file__).resolve().parents[2]
 
-    payload = build_quality_report(root)
+    payload = build_quality_report(root, today=date(2026, 5, 21))
 
     checks = payload["data_quality_checks"]
     assert checks["low_quality_group_count"] == 0

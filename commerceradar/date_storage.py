@@ -10,6 +10,7 @@ the repo uniformly.
 
 from __future__ import annotations
 
+import logging
 import re
 import shutil
 from datetime import UTC, date, datetime, timedelta
@@ -20,6 +21,8 @@ from radar_core.date_storage import (
     snapshot_database,
 )
 from radar_core.raw_logger import RawLogger  # noqa: F401  (contract surface)
+
+logger = logging.getLogger(__name__)
 
 
 def materialize_kg_raw_snapshot(
@@ -62,6 +65,43 @@ def _parse_date_token(value: str) -> date | None:
     return None
 
 
+def _compact_database(database_path: Path) -> dict[str, object]:
+    """Shrink ``database_path`` before it is copied or committed.
+
+    Compaction failure must not block the report or the snapshot. The file
+    already on disk is left in place. ``RADAR_DUCKDB_MAX_BYTES`` and
+    ``RADAR_DUCKDB_COMPACT=0`` are read inside ``compact_duckdb_file``.
+    The default budget is 90 MiB.
+    """
+    bytes_now = database_path.stat().st_size if database_path.exists() else 0
+    fallback: dict[str, object] = {
+        "compacted": False,
+        "reason": "missing" if not database_path.exists() else "skipped",
+        "bytes": bytes_now,
+        "bytes_before": bytes_now,
+        "rows_deleted": 0,
+    }
+    if not database_path.exists():
+        return fallback
+    try:
+        from radar_core.db_compact import compact_duckdb_file
+    except ImportError as exc:
+        logger.warning("duckdb_compact_unavailable path=%s error=%s", database_path, exc)
+        fallback["reason"] = "unavailable"
+        return fallback
+    try:
+        result = compact_duckdb_file(database_path)
+    except Exception as exc:
+        logger.warning("duckdb_compact_failed path=%s error=%s", database_path, exc)
+        fallback["reason"] = "failed"
+        fallback["bytes"] = database_path.stat().st_size if database_path.exists() else 0
+        return fallback
+    if isinstance(result, dict):
+        return result
+    fallback["reason"] = "invalid_result"
+    return fallback
+
+
 def cleanup_dated_files(path: Path, *, keep_days: int, today: date | None = None) -> int:
     if not path.exists() or keep_days < 0:
         return 0
@@ -86,13 +126,15 @@ def apply_date_storage_policy(
     keep_report_days: int = 90,
     keep_snapshot_days: int = 30,
     snapshot_date: date | None = None,
-) -> dict[str, Path | int | None]:
+) -> dict[str, object]:
     """Run radar-core retention + add CommerceRadar's KG raw materialisation."""
     raw_dir = materialize_kg_raw_snapshot(project_root, snapshot_date=snapshot_date)
     database_path = project_root / "data" / "radar_data.duckdb"
     raw_data_dir = project_root / "data" / "raw"
     report_dir = project_root / "reports"
     snapshot_dir = project_root / "data" / "daily"
+    # Compact first so the snapshot is a copy of the file that will be committed.
+    compact = _compact_database(database_path)
     snapshot_path: Path | None = None
     if snapshot_db and database_path.exists():
         snapshot_path = snapshot_database(
@@ -109,6 +151,7 @@ def apply_date_storage_policy(
         "raw_pruned": raw_pruned,
         "report_pruned": report_pruned,
         "snapshot_pruned": snapshot_pruned,
+        "duckdb_compact": compact,
     }
 
 

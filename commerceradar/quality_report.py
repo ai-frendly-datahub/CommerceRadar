@@ -340,8 +340,8 @@ def _raw_trend_extraction_quality(row: dict[str, Any]) -> float:
     return float(sum(weight for weight, passed in checks if passed))
 
 
-def _data_quality_checks(project_root: Path) -> dict[str, Any]:
-    today = datetime.now(UTC).date()
+def _data_quality_checks(project_root: Path, *, today: date | None = None) -> dict[str, Any]:
+    today = today or datetime.now(UTC).date()
     sample_checks = _validate_sample_data(project_root)
     reference_checks = _reference_checks(project_root)
     raw_checks = _raw_duplicate_checks(project_root)
@@ -350,10 +350,10 @@ def _data_quality_checks(project_root: Path) -> dict[str, Any]:
     return {**sample_checks, **reference_checks, **raw_checks, **quality_scores, **evidence_validity}
 
 
-def build_quality_report(project_root: Path) -> dict[str, Any]:
+def build_quality_report(project_root: Path, *, today: date | None = None) -> dict[str, Any]:
     reports_dir = project_root / "reports"
     summary_path = _latest_summary(reports_dir)
-    data_quality_checks = _data_quality_checks(project_root)
+    data_quality_checks = _data_quality_checks(project_root, today=today)
     if summary_path is None:
         return {
             "category": "commerce",
