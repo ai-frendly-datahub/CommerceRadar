@@ -130,3 +130,70 @@ def test_apply_date_storage_policy_materializes_and_prunes(tmp_path: Path) -> No
     assert result["snapshot_pruned"] == 1
     assert not raw_old.exists()
     assert not (reports_dir / "commerce_20260101_summary.json").exists()
+    assert result["duckdb_compact"]["reason"] == "within_limit"
+
+
+@pytest.mark.unit
+def test_apply_date_storage_policy_compacts_before_snapshot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    sample_dir = tmp_path / "data" / "samples"
+    sample_dir.mkdir(parents=True)
+    (sample_dir / "trends.jsonl").write_text('{"id":"t1"}\n', encoding="utf-8")
+    db_path = tmp_path / "data" / "radar_data.duckdb"
+    db_path.write_text("db", encoding="utf-8")
+    order: list[str] = []
+
+    def compact(path: Path, **kwargs: object) -> dict[str, object]:
+        order.append("compact")
+        assert path == db_path
+        assert kwargs == {}
+        return {
+            "compacted": False,
+            "reason": "within_limit",
+            "bytes": 2,
+            "bytes_before": 2,
+            "rows_deleted": 0,
+        }
+
+    def snapshot(path: Path, **kwargs: object) -> Path:
+        order.append("snapshot")
+        assert path.read_text(encoding="utf-8") == "db"
+        dest = tmp_path / "data" / "daily" / "2026-05-21" / path.name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+        return dest
+
+    import radar_core.db_compact as db_compact
+
+    monkeypatch.setattr(db_compact, "compact_duckdb_file", compact)
+    monkeypatch.setattr("commerceradar.date_storage.snapshot_database", snapshot)
+
+    result = apply_date_storage_policy(tmp_path, snapshot_db=True, snapshot_date=date(2026, 5, 21))
+
+    assert order == ["compact", "snapshot"]
+    assert result["duckdb_compact"]["reason"] == "within_limit"
+    assert result["snapshot_path"] == tmp_path / "data" / "daily" / "2026-05-21" / "radar_data.duckdb"
+
+
+@pytest.mark.unit
+def test_apply_date_storage_policy_snapshots_when_compact_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    sample_dir = tmp_path / "data" / "samples"
+    sample_dir.mkdir(parents=True)
+    (sample_dir / "trends.jsonl").write_text('{"id":"t1"}\n', encoding="utf-8")
+    db_path = tmp_path / "data" / "radar_data.duckdb"
+    db_path.write_text("db", encoding="utf-8")
+
+    def boom(path: Path, **kwargs: object) -> dict[str, object]:
+        raise RuntimeError("compact failed")
+
+    import radar_core.db_compact as db_compact
+
+    monkeypatch.setattr(db_compact, "compact_duckdb_file", boom)
+
+    result = apply_date_storage_policy(tmp_path, snapshot_db=True, snapshot_date=date(2026, 5, 21))
+
+    assert db_path.read_text(encoding="utf-8") == "db"
+    assert result["duckdb_compact"]["reason"] == "failed"
+    assert result["snapshot_path"] == tmp_path / "data" / "daily" / "2026-05-21" / "radar_data.duckdb"
+    assert result["snapshot_path"].read_text(encoding="utf-8") == "db"

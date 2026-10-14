@@ -57,6 +57,15 @@ def main() -> int:
     print(f"articles (kg trends): {len(annotated)}")
     if storage_result.get("raw_dir_created"):
         print(f"raw_dir: {storage_result['raw_dir_created'].relative_to(PROJECT_ROOT)}")
+    compact = storage_result.get("duckdb_compact") or {}
+    if compact:
+        print(
+            "duckdb_compact:"
+            f" reason={compact.get('reason')}"
+            f" bytes_before={compact.get('bytes_before')}"
+            f" bytes={compact.get('bytes')}"
+            f" rows_deleted={compact.get('rows_deleted')}"
+        )
     if storage_result.get("snapshot_path"):
         print(f"snapshot: {storage_result['snapshot_path'].relative_to(PROJECT_ROOT)}")
     print(f"raw_pruned: {storage_result.get('raw_pruned', 0)}")
