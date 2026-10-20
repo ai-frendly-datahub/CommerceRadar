@@ -2,7 +2,10 @@ sources:
   - id: manufacturer_websites
     name: Manufacturer Websites
     type: html
-    enabled: true
+    # 단일 공개 RSS/페이지가 없다. 제조사 홈페이지는 사이트마다 robots.txt가 달라
+    # 임의 HTML을 수집하지 않는다.
+    enabled: false
+    notes: 단일 공개 RSS가 없고 사이트별 robots.txt를 우회하지 않기 위해 비활성화
     trust_tier: T3_public_web
     domain_scope: manufacturer
     verification_role: primary_discovery
@@ -20,9 +23,12 @@ sources:
 
   - id: korea_factory_registration
     name: Korea Factory Registration
-    type: api
-    url: https://www.data.go.kr/
+    type: html_meta
+    # 기존 https://www.data.go.kr/ 는 포털 홈이라 공장등록 레코드가 없다.
+    # OpenAPI는 서비스키가 필요해 호출하지 않고, 키 없이 열리는 공식 파일데이터 페이지만 사용한다.
+    url: https://www.data.go.kr/data/15105482/fileData.do
     enabled: true
+    notes: 전국등록공장현황 공개 파일데이터 페이지. CSV 원문과 인증 API는 수집하지 않음
     trust_tier: T1_official
     domain_scope: manufacturer
     verification_role: official_registration_reference
@@ -37,9 +43,13 @@ sources:
 
   - id: korea_ecommerce_business_registration
     name: Korea Ecommerce Business Registration
-    type: api
-    url: https://www.data.go.kr/
+    type: html_meta
+    # 기존 https://www.data.go.kr/ 는 포털 홈이라 통신판매 사업자 목록이 없다.
+    # 공정위 다운로드 화면은 지역 선택 후 CSV를 만드는 스크립트라 파싱할 공개 목록이 없고,
+    # CSV에는 전화번호 등 개인정보 항목이 있어 내려받지 않는다.
+    url: https://www.data.go.kr/data/15083251/fileData.do
     enabled: true
+    notes: 통신판매사업자 공개 파일데이터 페이지. CSV 원문은 수집하지 않음
     trust_tier: T1_official
     domain_scope: seller
     verification_role: official_registration_reference
@@ -56,7 +66,11 @@ sources:
     name: NAVER DataLab
     type: naver_datalab
     url: https://datalab.naver.com/
-    enabled: true
+    # robots.txt User-agent: * / Allow: /$ / Allow: /index.naver / Disallow: /
+    # 홈 외 경로는 차단이다. 쇼핑인사이트 API는 클라이언트 인증키가 필요하며
+    # 챌린지와 로그인 화면은 우회하지 않는다.
+    enabled: false
+    notes: robots.txt가 / 를 차단하고 공식 API는 인증키가 필요함
     trust_tier: T1_official_platform
     domain_scope: trend
     verification_role: attention_reference
@@ -74,9 +88,12 @@ sources:
 
   - id: kosis
     name: KOSIS Online Shopping Statistics
-    type: api
-    url: https://kosis.kr/
+    type: rss
+    # 기존 https://kosis.kr/ 는 포털 홈이라 RSS로 파싱되지 않는다.
+    # 공식 RSS 안내(https://kosis.kr/serviceInfo/rssGuide.do)의 공지 RSS로 교체.
+    url: https://kosis.kr/rss/notice_rss.jsp
     enabled: true
+    notes: KOSIS 공식 공지 RSS. 통계표 API는 인증키가 필요해 호출하지 않음
     trust_tier: T1_official
     domain_scope: market_statistics
     verification_role: official_statistics_reference
@@ -92,9 +109,14 @@ sources:
 
   - id: customs_trade_statistics
     name: Customs Trade Statistics
-    type: api
-    url: https://uncomtrade.org/
+    type: rss
+    # https://uncomtrade.org/ 는 무역통계 포털이 아니라 Help Center로 바뀌었고
+    # comtradeplus.un.org 는 공개 RSS가 없는 단일 페이지 앱이다.
+    # 월간 수출입 현황이 올라오는 관세청 공식 보도자료 RSS로 교체.
+    # robots.txt는 /kcs/selectBoardRss.do 를 막지 않는다. /na/ntt/ 게시판 경로는 수집하지 않는다.
+    url: https://www.customs.go.kr/kcs/selectBoardRss.do?mi=15265&bbsId=1362
     enabled: true
+    notes: 관세청 공식 보도자료 RSS. UN Comtrade 미리보기 API는 사용하지 않음
     trust_tier: T1_official
     domain_scope: trade_flow
     verification_role: official_trade_reference
@@ -113,7 +135,11 @@ sources:
     name: Rakuten Web Service
     type: api
     url: https://webservice.rakuten.co.jp/
-    enabled: true
+    # 상품 검색/랭킹 API는 applicationId가 필요하다. 공개 RSS가 없고
+    # 공식 블로그 RSS(rakuten-webservice.tumblr.com/rss)는 연결이 끊긴다.
+    # 인증과 연결 차단은 우회하지 않는다.
+    enabled: false
+    notes: 상품 API는 applicationId가 필요하고 공개 RSS 연결이 실패함
     trust_tier: T2_platform
     domain_scope: target_market
     verification_role: platform_market_reference
@@ -133,7 +159,10 @@ sources:
   - id: flomers_internal_transactions
     name: Flomers Internal Transactions
     type: first_party
-    enabled: true
+    # 연결된 내부 거래 피드가 없다. data/samples/transactions.jsonl 은
+    # 테스트 시드이므로 수집 기사로 만들지 않는다.
+    enabled: false
+    notes: 내부 거래 피드 미연결. 샘플 거래는 수집하지 않음
     trust_tier: T1_first_party
     domain_scope: transaction_result
     verification_role: validated_trade_outcome

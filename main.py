@@ -40,7 +40,7 @@ def main() -> int:
     from commerceradar.reporter import generate_report
 
     config = load_category_config(args.category)
-    articles = collect_sources(config, project_root=PROJECT_ROOT)
+    articles, collection = collect_sources(config, project_root=PROJECT_ROOT)
     annotated = apply_entity_rules(articles, config.entities)
 
     storage_result = apply_date_storage_policy(
@@ -50,11 +50,16 @@ def main() -> int:
         keep_report_days=args.keep_report_days,
         keep_snapshot_days=args.keep_days,
     )
-    report_paths = generate_report(project_root=PROJECT_ROOT)
+    report_paths = generate_report(project_root=PROJECT_ROOT, collection=collection)
     quality_path = write_quality_report(PROJECT_ROOT)
 
     print(f"category: {config.category_name}")
-    print(f"articles (kg trends): {len(annotated)}")
+    print(f"articles: {len(annotated)}")
+    print(f"enabled_sources: {collection.get('source_count', 0)}")
+    print(f"collected_sources: {collection.get('collected_source_count', 0)}")
+    for row in collection.get("results") or []:
+        reason = f" {row.get('reason')}" if row.get("reason") and row.get("status") != "ok" else ""
+        print(f"source {row.get('id')}: {row.get('status')} count={row.get('count', 0)}{reason}")
     if storage_result.get("raw_dir_created"):
         print(f"raw_dir: {storage_result['raw_dir_created'].relative_to(PROJECT_ROOT)}")
     compact = storage_result.get("duckdb_compact") or {}

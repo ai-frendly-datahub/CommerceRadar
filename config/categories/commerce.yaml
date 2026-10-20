@@ -1,13 +1,14 @@
 category_name: commerce
 display_name: Commerce KG Radar
 
-# CommerceRadar's "sources" are local KG sample feeds, not network endpoints.
+# Local JSONL rows are KG sample seeds. The collector must not emit them as articles.
 sources:
   - id: commerce_kg_trends
     name: Flomers Commerce KG Trends
     type: jsonl
     url: local://commerce/trends
-    enabled: true
+    # 샘플 트렌드 시드. 수집기가 이 파일을 기사로 만들지 않도록 끈다.
+    enabled: false
     language: ko
     country: KR
     trust_tier: T2_expert
@@ -19,7 +20,8 @@ sources:
     name: Flomers Commerce KG Manufacturers
     type: jsonl
     url: local://commerce/manufacturers
-    enabled: true
+    # 샘플 제조사 시드. 수집 산출물이 아니다.
+    enabled: false
     language: ko
     country: KR
     trust_tier: T2_expert

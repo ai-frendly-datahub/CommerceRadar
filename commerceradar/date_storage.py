@@ -1,18 +1,13 @@
 """CommerceRadar date-partitioned storage.
 
-CommerceRadar's primary data is a KG sample seed (`data/samples/*.jsonl`)
-rather than a time-series collection. To satisfy the standard `daily_collection`
-contract (raw_data_by_date + snapshot_path_by_date + retention CLI), this
-module wraps `radar_core.date_storage` and additionally materialises today's
-KG snapshot under `data/raw/<YYYY-MM-DD>/` so dashboard/analysis can treat
-the repo uniformly.
+The daily collector writes public-source articles under `data/raw/<YYYY-MM-DD>/`.
+KG sample JSONL stays in `data/samples/` and is not copied into the raw log.
 """
 
 from __future__ import annotations
 
 import logging
 import re
-import shutil
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -30,24 +25,14 @@ def materialize_kg_raw_snapshot(
     *,
     snapshot_date: date | None = None,
 ) -> Path | None:
-    """Copy today's KG sample seed into `data/raw/<YYYY-MM-DD>/`.
+    """Do not copy KG sample JSONL into the dated raw log.
 
-    CommerceRadar's "raw collection" is a synthesised view of the sample
-    KG seed for the current date. This makes the date-partitioned layout
-    visible to standard tooling without changing the underlying KG flow.
+    ``data/samples/*.jsonl`` remains in the repository for tests and match
+    cards. Collection runs must not republish those rows as fresh raw data.
+    The arguments are kept so existing callers stay compatible.
     """
-    samples = project_root / "data" / "samples"
-    if not samples.exists():
-        return None
-    target_date = snapshot_date or datetime.now(UTC).date()
-    raw_dir = project_root / "data" / "raw" / target_date.isoformat()
-    raw_dir.mkdir(parents=True, exist_ok=True)
-    written: list[Path] = []
-    for source in samples.glob("*.jsonl"):
-        dest = raw_dir / source.name
-        shutil.copy2(source, dest)
-        written.append(dest)
-    return raw_dir if written else None
+    del project_root, snapshot_date
+    return None
 
 
 def _parse_date_token(value: str) -> date | None:
@@ -127,7 +112,7 @@ def apply_date_storage_policy(
     keep_snapshot_days: int = 30,
     snapshot_date: date | None = None,
 ) -> dict[str, object]:
-    """Run radar-core retention + add CommerceRadar's KG raw materialisation."""
+    """Run radar-core retention. Sample JSONL is not copied into ``data/raw``."""
     raw_dir = materialize_kg_raw_snapshot(project_root, snapshot_date=snapshot_date)
     database_path = project_root / "data" / "radar_data.duckdb"
     raw_data_dir = project_root / "data" / "raw"

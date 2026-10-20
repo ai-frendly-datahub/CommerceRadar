@@ -14,7 +14,7 @@ def test_build_report_payload_generates_dashboard_summary_fields():
     assert payload["date"] == "2026-04-28"
     assert payload["article_count"] >= 1
     assert payload["matched_count"] <= payload["article_count"]
-    assert payload["source_count"] == 8
+    assert payload["source_count"] == 4
     assert payload["collected_source_count"] >= 1
     assert payload["supported_evidence_count"] == payload["article_count"]
     assert payload["pending_evidence_count"] == 0
