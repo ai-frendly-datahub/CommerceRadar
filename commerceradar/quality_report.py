@@ -404,8 +404,10 @@ def build_quality_report(project_root: Path, *, today: date | None = None) -> di
         "sources_fresh": collected_source_count,
         "collection_errors": 0,
         "controlled_rollout": {"required": 0, "passed": 0},
-        "daily_review_items": int(summary.get("article_count") or 0)
-        - int(summary.get("matched_count") or 0),
+        "daily_review_items": max(
+            0,
+            int(summary.get("article_count") or 0) - int(summary.get("matched_count") or 0),
+        ),
         "pending_evidence_items": int(summary.get("pending_evidence_count") or 0),
         "warnings": warnings,
         "summary_file": summary_path.name,

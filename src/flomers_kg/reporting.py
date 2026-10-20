@@ -21,7 +21,12 @@ from .sample_pipeline import (
 )
 
 
-def build_report_payload(root: Path, report_date: date | None = None) -> dict[str, Any]:
+def build_report_payload(
+    root: Path,
+    report_date: date | None = None,
+    *,
+    collection: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     report_day = report_date or date.today()
     sample_dir = root / "data" / "samples"
     manufacturers = load_manufacturers(sample_dir / "manufacturers.jsonl")
@@ -91,23 +96,48 @@ def build_report_payload(root: Path, report_date: date | None = None) -> dict[st
 
     cards.sort(key=lambda item: (-float(item["score"]), str(item["title"])))
     matched_cards = [card for card in cards if float(card["score"]) >= 70.0]
-    source_distribution = _sources_distribution(evidence_rows, cards)
     evidence_status_counts = Counter(str(card.get("evidence_status") or "unknown") for card in cards)
+    warnings = _report_warnings(cards)
+    source_count = _enabled_source_count(root / "config" / "sources.yaml")
+    # Sample evidence types are not collection results. With no public run, report zero.
+    article_count = 0
+    collected_source_count = 0
+    sources: dict[str, int] = {}
+    collection_results: list[dict[str, Any]] = []
+    if collection is not None:
+        article_count, sources, collected_source_count = _public_collection_metrics(collection)
+        source_count = int(collection.get("source_count") or source_count)
+        raw_results = collection.get("results") or []
+        if isinstance(raw_results, list):
+            collection_results = [
+                row
+                for row in raw_results
+                if isinstance(row, dict) and not str(row.get("id") or "").startswith("sample_")
+            ]
+        for row in collection_results:
+            if str(row.get("status") or "") in {"ok", "disabled"}:
+                continue
+            reason = str(row.get("reason") or row.get("status") or "")
+            warnings.append(f"{row.get('id')}: {reason}")
+        if article_count == 0:
+            warnings.append("공개 출처 수집 0건. 샘플 출처로 채우지 않음")
 
     return {
         "category": "commerce",
         "date": report_day.isoformat(),
         "generated_at": datetime.now(UTC).isoformat(),
-        "article_count": len(cards),
+        "article_count": article_count,
+        "match_candidate_count": len(cards),
         "matched_count": len(matched_cards),
-        "source_count": _enabled_source_count(root / "config" / "sources.yaml"),
-        "collected_source_count": len(source_distribution),
+        "source_count": source_count,
+        "collected_source_count": collected_source_count,
         "supported_evidence_count": evidence_status_counts.get("supported", 0),
         "pending_evidence_count": evidence_status_counts.get("pending", 0),
         "top_entities": _top_entities(cards),
-        "sources": source_distribution,
+        "sources": sources,
+        "collection_results": collection_results,
         "distributor_distribution": _distributor_distribution(cards),
-        "warnings": _report_warnings(cards),
+        "warnings": warnings,
         "cards": cards,
     }
 
@@ -117,10 +147,11 @@ def write_report_artifacts(
     *,
     output_dir: Path | None = None,
     report_date: date | None = None,
+    collection: dict[str, Any] | None = None,
 ) -> dict[str, Path]:
     reports_dir = output_dir or root / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
-    payload = build_report_payload(root, report_date=report_date)
+    payload = build_report_payload(root, report_date=report_date, collection=collection)
     token = payload["date"].replace("-", "")
     summary_path = reports_dir / f"commerce_{token}_summary.json"
     report_path = reports_dir / f"commerce_{token}.html"
@@ -139,6 +170,7 @@ def write_report_artifacts(
 def render_report_html(payload: dict[str, Any]) -> str:
     cards = payload["cards"]
     card_blocks = "\n".join(_render_card(card) for card in cards)
+    collection_block = _render_collection(payload)
     return f"""<!doctype html>
 <html lang="ko">
 <head>
@@ -166,10 +198,12 @@ def render_report_html(payload: dict[str, Any]) -> str:
       <p>Generated at {html.escape(str(payload["generated_at"]))}</p>
     </header>
     <section class="summary">
-      <div class="metric">Candidates: <strong>{payload["article_count"]}</strong></div>
+      <div class="metric">Collected articles: <strong>{payload["article_count"]}</strong></div>
+      <div class="metric">Match candidates: <strong>{payload.get("match_candidate_count", payload["article_count"])}</strong></div>
       <div class="metric">Matched: <strong>{payload["matched_count"]}</strong></div>
       <div class="metric">Configured sources: <strong>{payload["source_count"]}</strong></div>
     </section>
+    {collection_block}
     {card_blocks}
   </main>
 </body>
@@ -195,6 +229,22 @@ def render_index_html(payload: dict[str, Any], report_filename: str, summary_fil
 </body>
 </html>
 """
+
+
+def _render_collection(payload: dict[str, Any]) -> str:
+    rows = payload.get("collection_results") or []
+    if not rows:
+        return ""
+    items = "".join(
+        "<li>"
+        f"{html.escape(str(row.get('id') or ''))}: "
+        f"{html.escape(str(row.get('count', 0)))} "
+        f"({html.escape(str(row.get('status') or ''))})"
+        "</li>"
+        for row in rows
+        if isinstance(row, dict)
+    )
+    return f"<section><h2>Source collection</h2><ul>{items}</ul></section>"
 
 
 def _render_card(card: dict[str, Any]) -> str:
@@ -281,6 +331,25 @@ def _top_entities(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for value in card.get("entities", {}).values():
             counter[str(value)] += 1
     return [{"name": name, "count": count} for name, count in counter.most_common(5)]
+
+
+def _public_collection_metrics(collection: dict[str, Any]) -> tuple[int, dict[str, int], int]:
+    """Count only public sources. ``sample_*`` rows are dropped, not backfilled."""
+    raw_sources = collection.get("sources") or {}
+    if not isinstance(raw_sources, dict):
+        raw_sources = {}
+    sources = {
+        str(key): int(value)
+        for key, value in raw_sources.items()
+        if not str(key).startswith("sample_") and isinstance(value, (int, float)) and not isinstance(value, bool)
+    }
+    had_sample_sources = any(str(key).startswith("sample_") for key in raw_sources)
+    if had_sample_sources:
+        article_count = sum(sources.values())
+    else:
+        article_count = int(collection.get("article_count") or 0)
+    collected_source_count = sum(1 for count in sources.values() if count > 0)
+    return article_count, sources, collected_source_count
 
 
 def _sources_distribution(rows: list[dict[str, Any]], cards: list[dict[str, Any]]) -> dict[str, int]:

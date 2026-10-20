@@ -53,7 +53,7 @@ def test_cleanup_dated_files_ignores_negative_retention(tmp_path: Path) -> None:
 
 
 @pytest.mark.unit
-def test_materialize_kg_raw_snapshot_copies_sample_jsonl(tmp_path: Path) -> None:
+def test_materialize_kg_raw_snapshot_does_not_copy_sample_jsonl(tmp_path: Path) -> None:
     sample_dir = tmp_path / "data" / "samples"
     sample_dir.mkdir(parents=True)
     (sample_dir / "trends.jsonl").write_text('{"id":"t1"}\n', encoding="utf-8")
@@ -61,9 +61,8 @@ def test_materialize_kg_raw_snapshot_copies_sample_jsonl(tmp_path: Path) -> None
 
     raw_dir = materialize_kg_raw_snapshot(tmp_path, snapshot_date=date(2026, 5, 21))
 
-    assert raw_dir == tmp_path / "data" / "raw" / "2026-05-21"
-    assert (raw_dir / "trends.jsonl").read_text(encoding="utf-8") == '{"id":"t1"}\n'
-    assert not (raw_dir / "notes.txt").exists()
+    assert raw_dir is None
+    assert not (tmp_path / "data" / "raw").exists()
 
 
 @pytest.mark.unit
@@ -123,7 +122,8 @@ def test_apply_date_storage_policy_materializes_and_prunes(tmp_path: Path) -> No
         snapshot_date=date(2026, 5, 21),
     )
 
-    assert result["raw_dir_created"] == tmp_path / "data" / "raw" / "2026-05-21"
+    assert result["raw_dir_created"] is None
+    assert not (tmp_path / "data" / "raw" / "2026-05-21" / "trends.jsonl").exists()
     assert result["snapshot_path"] == tmp_path / "data" / "daily" / "2026-05-21" / "radar_data.duckdb"
     assert result["raw_pruned"] == 1
     assert result["report_pruned"] == 1

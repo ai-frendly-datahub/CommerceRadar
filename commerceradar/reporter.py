@@ -20,6 +20,7 @@ def generate_report(
     *,
     project_root: Path | None = None,
     report_date: date | None = None,
+    collection: dict | None = None,
 ) -> dict[str, Path]:
     """Generate the daily commerce report via the KG pipeline."""
     import sys
@@ -31,7 +32,7 @@ def generate_report(
 
     from flomers_kg.reporting import write_report_artifacts
 
-    return write_report_artifacts(root, report_date=report_date)
+    return write_report_artifacts(root, report_date=report_date, collection=collection)
 
 
 def generate_index_html(
