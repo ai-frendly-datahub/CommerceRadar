@@ -203,6 +203,14 @@ def _result(
 
 def _collect_one(source: dict[str, Any], *, category: str) -> tuple[list[Article], dict[str, Any]]:
     source_id = str(source.get("id") or source.get("name") or "unknown")
+    if source_id.startswith("sample_") or str(source.get("type") or "").startswith("sample"):
+        skipped = _result(
+            source,
+            status="disabled",
+            reason="샘플 출처는 정기 수집에서 제외",
+        )
+        skipped["enabled"] = False
+        return [], skipped
     if source.get("enabled", True) is False:
         return [], _result(source, status="disabled")
     url = str(source.get("url") or "").strip()

@@ -42,7 +42,16 @@ def test_collect_sources_ignores_sample_trends(tmp_path: Path, monkeypatch: pyte
     )
     _write_sources(
         tmp_path,
-        "sources:\n  - id: closed\n    enabled: false\n    notes: 샘플이라 끔\n",
+        """
+sources:
+  - id: closed
+    enabled: false
+    notes: 샘플이라 끔
+  - id: sample_product_page
+    type: sample
+    url: https://example.com/abc
+    enabled: true
+""",
     )
 
     def fail_get(url: str, *, timeout: int = 20) -> _Response:
@@ -53,7 +62,11 @@ def test_collect_sources_ignores_sample_trends(tmp_path: Path, monkeypatch: pyte
 
     assert articles == []
     assert report["article_count"] == 0
+    assert report["source_count"] == 0
     assert report["results"][0]["status"] == "disabled"
+    assert report["results"][1]["id"] == "sample_product_page"
+    assert report["results"][1]["enabled"] is False
+    assert "sample_product_page" not in report["sources"]
     assert not (tmp_path / "data" / "raw").exists()
 
 

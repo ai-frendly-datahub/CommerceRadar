@@ -12,15 +12,43 @@ def test_build_report_payload_generates_dashboard_summary_fields():
 
     assert payload["category"] == "commerce"
     assert payload["date"] == "2026-04-28"
-    assert payload["article_count"] >= 1
-    assert payload["matched_count"] <= payload["article_count"]
+    assert payload["article_count"] == 0
+    assert payload["match_candidate_count"] >= 1
+    assert payload["matched_count"] <= payload["match_candidate_count"]
     assert payload["source_count"] == 4
-    assert payload["collected_source_count"] >= 1
-    assert payload["supported_evidence_count"] == payload["article_count"]
+    assert payload["collected_source_count"] == 0
+    assert payload["supported_evidence_count"] == payload["match_candidate_count"]
     assert payload["pending_evidence_count"] == 0
-    assert "sample_product_page" in payload["sources"]
+    assert payload["sources"] == {}
+    assert "sample_product_page" not in payload["sources"]
     assert payload["top_entities"]
     assert payload["warnings"] == []
+
+
+def test_zero_public_collection_is_not_filled_with_sample_sources():
+    payload = build_report_payload(
+        ROOT,
+        report_date=date(2026, 4, 28),
+        collection={
+            "article_count": 2,
+            "source_count": 4,
+            "collected_source_count": 3,
+            "sources": {
+                "sample_product_page": 2,
+                "sample_distributor_page": 2,
+                "sample_seller_channel": 2,
+                "kosis": 0,
+            },
+            "results": [{"id": "sample_trend", "status": "ok", "count": 2}],
+        },
+    )
+
+    assert payload["article_count"] == 0
+    assert payload["collected_source_count"] == 0
+    assert payload["sources"] == {"kosis": 0}
+    assert "sample_product_page" not in payload["sources"]
+    assert all(not str(row.get("id", "")).startswith("sample_") for row in payload["collection_results"])
+    assert "공개 출처 수집 0건. 샘플 출처로 채우지 않음" in payload["warnings"]
 
 
 def test_report_payload_has_no_pending_evidence_for_repository_samples():

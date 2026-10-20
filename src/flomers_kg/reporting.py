@@ -96,27 +96,31 @@ def build_report_payload(
 
     cards.sort(key=lambda item: (-float(item["score"]), str(item["title"])))
     matched_cards = [card for card in cards if float(card["score"]) >= 70.0]
-    source_distribution = _sources_distribution(evidence_rows, cards)
     evidence_status_counts = Counter(str(card.get("evidence_status") or "unknown") for card in cards)
     warnings = _report_warnings(cards)
-    article_count = len(cards)
     source_count = _enabled_source_count(root / "config" / "sources.yaml")
-    collected_source_count = len(source_distribution)
-    sources = source_distribution
+    # Sample evidence types are not collection results. With no public run, report zero.
+    article_count = 0
+    collected_source_count = 0
+    sources: dict[str, int] = {}
     collection_results: list[dict[str, Any]] = []
-    if collection:
-        article_count = int(collection.get("article_count") or 0)
+    if collection is not None:
+        article_count, sources, collected_source_count = _public_collection_metrics(collection)
         source_count = int(collection.get("source_count") or source_count)
-        collected_source_count = int(collection.get("collected_source_count") or 0)
-        sources = {str(key): int(value) for key, value in dict(collection.get("sources") or {}).items()}
         raw_results = collection.get("results") or []
         if isinstance(raw_results, list):
-            collection_results = [row for row in raw_results if isinstance(row, dict)]
+            collection_results = [
+                row
+                for row in raw_results
+                if isinstance(row, dict) and not str(row.get("id") or "").startswith("sample_")
+            ]
         for row in collection_results:
             if str(row.get("status") or "") in {"ok", "disabled"}:
                 continue
             reason = str(row.get("reason") or row.get("status") or "")
             warnings.append(f"{row.get('id')}: {reason}")
+        if article_count == 0:
+            warnings.append("공개 출처 수집 0건. 샘플 출처로 채우지 않음")
 
     return {
         "category": "commerce",
@@ -327,6 +331,25 @@ def _top_entities(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for value in card.get("entities", {}).values():
             counter[str(value)] += 1
     return [{"name": name, "count": count} for name, count in counter.most_common(5)]
+
+
+def _public_collection_metrics(collection: dict[str, Any]) -> tuple[int, dict[str, int], int]:
+    """Count only public sources. ``sample_*`` rows are dropped, not backfilled."""
+    raw_sources = collection.get("sources") or {}
+    if not isinstance(raw_sources, dict):
+        raw_sources = {}
+    sources = {
+        str(key): int(value)
+        for key, value in raw_sources.items()
+        if not str(key).startswith("sample_") and isinstance(value, (int, float)) and not isinstance(value, bool)
+    }
+    had_sample_sources = any(str(key).startswith("sample_") for key in raw_sources)
+    if had_sample_sources:
+        article_count = sum(sources.values())
+    else:
+        article_count = int(collection.get("article_count") or 0)
+    collected_source_count = sum(1 for count in sources.values() if count > 0)
+    return article_count, sources, collected_source_count
 
 
 def _sources_distribution(rows: list[dict[str, Any]], cards: list[dict[str, Any]]) -> dict[str, int]:
