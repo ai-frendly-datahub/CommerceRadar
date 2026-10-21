@@ -1,21 +1,20 @@
 {
   "category": "commerce",
-  "generated_at": "2026-10-20T21:45:43.766132+00:00",
+  "generated_at": "2026-10-21T21:51:37.997805+00:00",
   "sources_enabled": 4,
-  "sources_fresh": 3,
+  "sources_fresh": 4,
   "collection_errors": 0,
   "controlled_rollout": {
     "required": 0,
     "passed": 0
   },
-  "daily_review_items": 20,
+  "daily_review_items": 33,
   "pending_evidence_items": 0,
   "warnings": [
-    "kosis: robots.txt 확인 실패: HTTPSConnectionPool(host='kosis.kr', port=443): Max retries exceeded with url: /robots.txt (Caused by ConnectTimeoutError(<HTTPSConnection(host='kosis.kr', port=443) at 0x7ff7a068bad0>, 'Connection to kosis.kr timed out. (connect timeout=20)'))",
     "sample quality score below threshold",
     "evidence records are expired or expiring soon"
   ],
-  "summary_file": "commerce_20261021_summary.json",
+  "summary_file": "commerce_20261022_summary.json",
   "data_quality_checks": {
     "row_counts": {
       "manufacturers": 2,
