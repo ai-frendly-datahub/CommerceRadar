@@ -114,11 +114,11 @@ def _strip_text(value: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def _entry_published(entry: Any) -> datetime:
+def _entry_published(entry: Any) -> datetime | None:
     parsed = entry.get("published_parsed") or entry.get("updated_parsed")
     if isinstance(parsed, time.struct_time):
         return datetime(*parsed[:6], tzinfo=UTC)
-    return datetime.now(UTC)
+    return None
 
 
 def _parse_rss(content: bytes, *, source_id: str, category: str) -> list[Article]:
@@ -166,7 +166,7 @@ def _parse_html_meta(page: str, *, url: str, source_id: str, category: str) -> l
     if not title:
         return []
     summary = _strip_text(_meta_content(page, "og:description") or _meta_content(page, "description"))
-    published = datetime.now(UTC)
+    published = None
     dated = re.search(r"(?:수정일|등록일)[^0-9]{0,40}(20\d{2}-\d{2}-\d{2})", page)
     if dated:
         published = datetime.fromisoformat(dated.group(1)).replace(tzinfo=UTC)

@@ -360,16 +360,27 @@ def build_quality_report(project_root: Path, *, today: date | None = None) -> di
             "generated_at": datetime.now(UTC).isoformat(),
             "sources_enabled": 0,
             "sources_fresh": 0,
+            "sources_collected": 0,
             "collection_errors": 0,
             "controlled_rollout": {"required": 0, "passed": 0},
             "daily_review_items": 0,
             "warnings": ["no commerce summary available"],
-            "data_quality_checks": data_quality_checks,
+            "sample_data_checks": data_quality_checks,
+            "data_quality_checks": {"scope": "public_collection", "status": "not_evaluated"},
+            "sample_warnings": [],
+            "freshness_evaluated": False,
         }
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
     sources = summary.get("sources") or {}
-    collected_source_count = int(summary.get("collected_source_count") or len(sources))
+    collected_source_count = sum(
+        1 for source, count in sources.items()
+        if not str(source).startswith("sample_") and isinstance(count, (int, float)) and count > 0
+    )
     warnings = list(summary.get("warnings") or [])
+    collection_warnings = list(warnings)
+    # Legacy checks inspect sample seeds and old KG logs, not this public run.
+    # Keep their diagnostics separate from production collection warnings.
+    warnings = []
     if data_quality_checks["schema_error_count"]:
         warnings.append("sample schema validation errors exist")
     if data_quality_checks["duplicate_id_count"]:
@@ -396,22 +407,28 @@ def build_quality_report(project_root: Path, *, today: date | None = None) -> di
     if data_quality_checks["evidence_expiring_soon_count"] or data_quality_checks["evidence_expired_count"]:
         warnings.append("evidence records are expired or expiring soon")
     if int(summary.get("pending_evidence_count") or 0):
-        warnings.append("match candidates have pending evidence")
+        collection_warnings.append("match candidates have pending evidence")
+    collection_warnings.append("content freshness has not been evaluated")
+    results = summary.get("collection_results") or []
     return {
         "category": "commerce",
         "generated_at": datetime.now(UTC).isoformat(),
         "sources_enabled": int(summary.get("source_count") or 0),
-        "sources_fresh": collected_source_count,
-        "collection_errors": 0,
+        "sources_fresh": 0,
+        "sources_collected": collected_source_count,
+        "freshness_evaluated": False,
+        "collection_errors": sum(row.get("status") in {"error", "blocked"} for row in results),
         "controlled_rollout": {"required": 0, "passed": 0},
         "daily_review_items": max(
             0,
             int(summary.get("article_count") or 0) - int(summary.get("matched_count") or 0),
         ),
         "pending_evidence_items": int(summary.get("pending_evidence_count") or 0),
-        "warnings": warnings,
+        "warnings": collection_warnings,
+        "sample_warnings": warnings,
         "summary_file": summary_path.name,
-        "data_quality_checks": data_quality_checks,
+        "sample_data_checks": data_quality_checks,
+        "data_quality_checks": {"scope": "public_collection", "status": "not_evaluated"},
     }
 
 
