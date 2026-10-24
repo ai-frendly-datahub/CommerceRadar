@@ -1,6 +1,6 @@
 """CommerceRadar orchestrator — standard Radar entry point.
 
-Pipeline: load category config -> collect Articles from KG samples ->
+Pipeline: load category config -> collect public source Articles ->
 apply entity rules -> generate report -> write quality report.
 """
 

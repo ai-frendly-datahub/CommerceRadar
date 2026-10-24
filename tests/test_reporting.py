@@ -73,3 +73,31 @@ def test_write_report_artifacts_outputs_summary_report_and_index(tmp_path):
     assert paths["summary"].is_file()
     assert paths["report"].read_text(encoding="utf-8").startswith("<!doctype html>")
     assert "commerce_20260428.html" in paths["index"].read_text(encoding="utf-8")
+
+
+def test_public_collection_does_not_promote_sample_matches_or_evidence():
+    demo = build_report_payload(ROOT, report_date=date(2026, 10, 22))
+    assert demo["data_scope"] == "sample_demo"
+    assert demo["match_candidate_count"] == 2
+    payload = build_report_payload(
+        ROOT, report_date=date(2026, 10, 22),
+        collection={"article_count": 35, "source_count": 4, "sources": {"kosis": 13}},
+    )
+    assert payload["data_scope"] == "public_collection"
+    assert payload["matching_scope"] == "not_evaluated"
+    assert payload["article_count"] == 35
+    for key in ["match_candidate_count", "matched_count", "supported_evidence_count", "pending_evidence_count"]:
+        assert payload[key] == 0
+    assert payload["cards"] == []
+    assert payload["top_entities"] == []
+    assert payload["distributor_distribution"] == {}
+
+
+def test_public_report_does_not_read_sample_seeds(tmp_path):
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "sources.yaml").write_text("sources: []", encoding="utf-8")
+    sample_dir = tmp_path / "data" / "samples"
+    sample_dir.mkdir(parents=True)
+    (sample_dir / "manufacturers.jsonl").write_text("not JSON", encoding="utf-8")
+    payload = build_report_payload(tmp_path, collection={"article_count": 0})
+    assert payload["cards"] == []
