@@ -1,6 +1,6 @@
 {
   "category": "commerce",
-  "generated_at": "2026-10-25T21:01:38.653151+00:00",
+  "generated_at": "2026-10-26T22:47:23.980123+00:00",
   "sources_enabled": 4,
   "sources_fresh": 4,
   "collection_errors": 0,
@@ -8,18 +8,13 @@
     "required": 0,
     "passed": 0
   },
-  "daily_review_items": 0,
+  "daily_review_items": 33,
   "pending_evidence_items": 0,
   "warnings": [
-    "korea_factory_registration: robots.txt 확인 실패: HTTPSConnectionPool(host='www.data.go.kr', port=443): Max retries exceeded with url: /robots.txt (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.data.go.kr', port=443) at 0x7ff1121a68d0>, 'Connection to www.data.go.kr timed out. (connect timeout=20)'))",
-    "korea_ecommerce_business_registration: robots.txt 확인 실패: HTTPSConnectionPool(host='www.data.go.kr', port=443): Max retries exceeded with url: /robots.txt (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.data.go.kr', port=443) at 0x7ff111f63fd0>, 'Connection to www.data.go.kr timed out. (connect timeout=20)'))",
-    "kosis: robots.txt 확인 실패: HTTPSConnectionPool(host='kosis.kr', port=443): Max retries exceeded with url: /robots.txt (Caused by ConnectTimeoutError(<HTTPSConnection(host='kosis.kr', port=443) at 0x7ff111f55750>, 'Connection to kosis.kr timed out. (connect timeout=20)'))",
-    "customs_trade_statistics: robots.txt 확인 실패: HTTPSConnectionPool(host='www.customs.go.kr', port=443): Max retries exceeded with url: /robots.txt (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.customs.go.kr', port=443) at 0x7ff111f57510>, 'Connection to www.customs.go.kr timed out. (connect timeout=20)'))",
-    "공개 출처 수집 0건. 샘플 출처로 채우지 않음",
     "sample quality score below threshold",
     "evidence records are expired or expiring soon"
   ],
-  "summary_file": "commerce_20261026_summary.json",
+  "summary_file": "commerce_20261027_summary.json",
   "data_quality_checks": {
     "row_counts": {
       "manufacturers": 2,
