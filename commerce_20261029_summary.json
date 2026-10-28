@@ -1,0 +1,137 @@
+{
+  "category": "commerce",
+  "date": "2026-10-29",
+  "generated_at": "2026-10-28T22:43:40.577974+00:00",
+  "article_count": 36,
+  "match_candidate_count": 2,
+  "matched_count": 2,
+  "source_count": 4,
+  "collected_source_count": 4,
+  "supported_evidence_count": 2,
+  "pending_evidence_count": 0,
+  "top_entities": [
+    {
+      "name": "ABC코스메틱",
+      "count": 1
+    },
+    {
+      "name": "노워시 퍼퓸 헤어오일",
+      "count": 1
+    },
+    {
+      "name": "Tokyo Beauty Distribution",
+      "count": 1
+    },
+    {
+      "name": "Tokyo Beauty Select",
+      "count": 1
+    },
+    {
+      "name": "서울리빙팩토리",
+      "count": 1
+    }
+  ],
+  "sources": {
+    "korea_factory_registration": 1,
+    "korea_ecommerce_business_registration": 1,
+    "kosis": 14,
+    "customs_trade_statistics": 20
+  },
+  "collection_results": [
+    {
+      "id": "manufacturer_websites",
+      "name": "Manufacturer Websites",
+      "enabled": false,
+      "url": "",
+      "status": "disabled",
+      "count": 0,
+      "reason": "단일 공개 RSS가 없고 사이트별 robots.txt를 우회하지 않기 위해 비활성화"
+    },
+    {
+      "id": "korea_factory_registration",
+      "name": "Korea Factory Registration",
+      "enabled": true,
+      "url": "https://www.data.go.kr/data/15105482/fileData.do",
+      "status": "ok",
+      "count": 1,
+      "reason": "전국등록공장현황 공개 파일데이터 페이지. CSV 원문과 인증 API는 수집하지 않음"
+    },
+    {
+      "id": "korea_ecommerce_business_registration",
+      "name": "Korea Ecommerce Business Registration",
+      "enabled": true,
+      "url": "https://www.data.go.kr/data/15083251/fileData.do",
+      "status": "ok",
+      "count": 1,
+      "reason": "통신판매사업자 공개 파일데이터 페이지. CSV 원문은 수집하지 않음"
+    },
+    {
+      "id": "naver_datalab",
+      "name": "NAVER DataLab",
+      "enabled": false,
+      "url": "https://datalab.naver.com/",
+      "status": "disabled",
+      "count": 0,
+      "reason": "robots.txt가 / 를 차단하고 공식 API는 인증키가 필요함"
+    },
+    {
+      "id": "kosis",
+      "name": "KOSIS Online Shopping Statistics",
+      "enabled": true,
+      "url": "https://kosis.kr/rss/notice_rss.jsp",
+      "status": "ok",
+      "count": 14,
+      "reason": "KOSIS 공식 공지 RSS. 통계표 API는 인증키가 필요해 호출하지 않음"
+    },
+    {
+      "id": "customs_trade_statistics",
+      "name": "Customs Trade Statistics",
+      "enabled": true,
+      "url": "https://www.customs.go.kr/kcs/selectBoardRss.do?mi=15265&bbsId=1362",
+      "status": "ok",
+      "count": 20,
+      "reason": "관세청 공식 보도자료 RSS. UN Comtrade 미리보기 API는 사용하지 않음"
+    },
+    {
+      "id": "rakuten_web_service",
+      "name": "Rakuten Web Service",
+      "enabled": false,
+      "url": "https://webservice.rakuten.co.jp/",
+      "status": "disabled",
+      "count": 0,
+      "reason": "상품 API는 applicationId가 필요하고 공개 RSS 연결이 실패함"
+    },
+    {
+      "id": "flomers_internal_transactions",
+      "name": "Flomers Internal Transactions",
+      "enabled": false,
+      "url": "",
+      "status": "disabled",
+      "count": 0,
+      "reason": "내부 거래 피드 미연결. 샘플 거래는 수집하지 않음"
+    },
+    {
+      "id": "xiaohongshu_open_platform",
+      "name": "Xiaohongshu Open Platform",
+      "enabled": false,
+      "url": "",
+      "status": "disabled",
+      "count": 0,
+      "reason": ""
+    },
+    {
+      "id": "douyin_open_platform",
+      "name": "Douyin Open Platform",
+      "enabled": false,
+      "url": "",
+      "status": "disabled",
+      "count": 0,
+      "reason": ""
+    }
+  ],
+  "distributor_distribution": {
+    "Tokyo Beauty Distribution": 1,
+    "Osaka Lifestyle Distribution": 1
+  },
+  "warnings": []
+}
