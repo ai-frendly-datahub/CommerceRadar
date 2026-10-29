@@ -15,6 +15,8 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
+from commerceradar.sample_filter import split_sample_rows
+
 
 SAMPLE_SCHEMA_PAIRS = {
     "manufacturers": ("manufacturers.jsonl", "manufacturer.schema.json"),
@@ -264,19 +266,23 @@ def _raw_duplicate_checks(project_root: Path) -> dict[str, Any]:
         return {
             "raw_trend_log": None,
             "raw_trend_rows": 0,
+            "raw_trend_sample_rows_excluded": 0,
             "raw_trend_duplicate_link_count": 0,
             "raw_trend_missing_kg_id_count": 0,
             "raw_trend_missing_entity_count": 0,
             "raw_trend_missing_source_observed_at_count": 0,
             "raw_trend_average_extraction_quality": 0.0,
         }
-    rows = _read_jsonl(path)
+    # Rows tagged ``is_sample`` (or from a ``sample*`` source) are demo rows, not
+    # collected data. They are counted separately and kept out of real metrics.
+    rows, sample_rows = split_sample_rows(_read_jsonl(path))
     links = [str(row.get("link")) for row in rows if row.get("link")]
     duplicate_count = sum(count - 1 for count in Counter(links).values() if count > 1)
     quality_scores = [_raw_trend_extraction_quality(row) for row in rows]
     return {
         "raw_trend_log": str(path.relative_to(project_root)),
         "raw_trend_rows": len(rows),
+        "raw_trend_sample_rows_excluded": len(sample_rows),
         "raw_trend_duplicate_link_count": duplicate_count,
         "raw_trend_missing_kg_id_count": sum(1 for row in rows if not _raw_trend_kg_id(row)),
         "raw_trend_missing_entity_count": sum(1 for row in rows if not _raw_trend_entities_complete(row)),
