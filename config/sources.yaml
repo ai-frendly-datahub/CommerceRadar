@@ -106,6 +106,13 @@ sources:
         - statistic_id
         - period
         - category
+      # 이벤트·공모·현행화율·지연 통계 공지만 제외한다. 통계 공지 출처는 유지.
+      exclude_title_keywords:
+        - 이벤트
+        - 당첨자
+        - 공모전
+        - 현행화율
+        - 서비스 지연 통계
 
   - id: customs_trade_statistics
     name: Customs Trade Statistics
@@ -130,6 +137,11 @@ sources:
         - origin_country
         - destination_country
         - period
+      # 인사·시상·단속왕 보도만 제외한다. 수출입 현황 등은 유지.
+      exclude_title_keywords:
+        - 관세청 인사
+        - 시상
+        - 단속왕
 
   - id: rakuten_web_service
     name: Rakuten Web Service
