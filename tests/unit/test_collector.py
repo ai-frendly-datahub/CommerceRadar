@@ -3,8 +3,14 @@ from pathlib import Path
 
 import pytest
 import requests
+import yaml
 
-from commerceradar.collector import _dedupe_jsonl_by_link, _project_root, collect_sources
+from commerceradar.collector import (
+    _dedupe_jsonl_by_link,
+    _keyword_matches_title,
+    _project_root,
+    collect_sources,
+)
 from commerceradar.models import CategoryConfig
 
 
@@ -208,3 +214,169 @@ def test_dedupe_jsonl_by_link_keeps_latest_record(tmp_path: Path) -> None:
 
     assert duplicates == 1
     assert rows == [{"title": "new", "link": "https://example.com/a", "ontology": {"kg_entity": {"id": "t1"}}}]
+
+
+# Titles quoted from the 2026-10-22~28 classified sample (offtopic spec §5).
+_KOSIS_NOISE_TITLES = [
+    "2026년 9월 국가통계포털 퀴즈 이벤트 당첨자 발표",
+    "제13회 국가승인통계 활용 디지털콘텐츠 공모전 수상작 발표",
+    "2026년 9월 말 기준 KOSIS 수록자료 현행화율 공개",
+    "2026년 2분기 기준 KOSIS 서비스 지연 통계 목록",
+]
+_CUSTOMS_NOISE_TITLES = [
+    "관세청 인사(부이사관 승진)",
+    "관세청, 9월의 관세인 및 3분기 핵심가치상 시상",
+    "관세청 9월의 마약단속왕에 정예진 주무관 선정",
+]
+_CUSTOMS_USEFUL_TITLES = [
+    "2026년 9월 월간 수출입 현황 [잠정치]",
+    "관세청, 해외직구 전용 통관 플랫폼 정식 개통",
+    "싸다고 샀다가 안전까지 위협… 두 달 새 짝퉁 28만 점 국경에서 막았다",
+]
+
+
+def _rss_feed(items: list[tuple[str, str]]) -> str:
+    parts = [
+        '<?xml version="1.0"?><rss version="2.0"><channel>',
+    ]
+    for title, link in items:
+        parts.append(
+            f"<item><title><![CDATA[{title}]]></title><link>{link}</link><description>quoted</description></item>"
+        )
+    parts.append("</channel></rss>")
+    return "".join(parts)
+
+
+def _repo_source(source_id: str) -> dict:
+    payload = yaml.safe_load((_project_root() / "config" / "sources.yaml").read_text(encoding="utf-8"))
+    for row in payload["sources"]:
+        if row.get("id") == source_id:
+            return row
+    raise AssertionError(source_id)
+
+
+@pytest.mark.unit
+def test_sources_yaml_keeps_kosis_and_sets_notice_exclusions() -> None:
+    kosis = _repo_source("kosis")
+    customs = _repo_source("customs_trade_statistics")
+
+    assert kosis["enabled"] is True
+    assert kosis["config"]["exclude_title_keywords"] == [
+        "이벤트",
+        "당첨자",
+        "공모전",
+        "현행화율",
+        "서비스 지연 통계",
+    ]
+    assert customs["config"]["exclude_title_keywords"] == ["관세청 인사", "시상", "단속왕"]
+
+
+@pytest.mark.unit
+def test_keyword_matches_title_uses_hangul_substring_and_ascii_word_boundary() -> None:
+    event_title = _KOSIS_NOISE_TITLES[0]
+    export_title = _CUSTOMS_USEFUL_TITLES[0]
+
+    assert _keyword_matches_title("이벤트", event_title)
+    assert _keyword_matches_title("당첨자", event_title)
+    assert not _keyword_matches_title("이벤트", export_title)
+    assert _keyword_matches_title("review", "Weekly review notes")
+    assert _keyword_matches_title("review", "Weekly reviews notes")
+    assert not _keyword_matches_title("review", "A reviewer note")
+    assert not _keyword_matches_title("review", "preview notes")
+
+
+@pytest.mark.unit
+def test_collect_sources_drops_quoted_notice_titles_and_records_excluded_count(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    kosis = _repo_source("kosis")
+    customs = _repo_source("customs_trade_statistics")
+    _write_sources(
+        tmp_path,
+        yaml.safe_dump(
+            {
+                "sources": [
+                    {
+                        "id": "kosis",
+                        "name": kosis["name"],
+                        "type": "rss",
+                        "url": "https://kosis.example/notice.xml",
+                        "enabled": True,
+                        "config": {"exclude_title_keywords": kosis["config"]["exclude_title_keywords"]},
+                    },
+                    {
+                        "id": "customs_trade_statistics",
+                        "name": customs["name"],
+                        "type": "rss",
+                        "url": "https://customs.example/press.xml",
+                        "enabled": True,
+                        "config": {"exclude_title_keywords": customs["config"]["exclude_title_keywords"]},
+                    },
+                    {
+                        "id": "open_feed",
+                        "name": "Unconfigured",
+                        "type": "rss",
+                        "url": "https://open.example/feed.xml",
+                        "enabled": True,
+                    },
+                ]
+            },
+            allow_unicode=True,
+            sort_keys=False,
+        ),
+    )
+    feeds = {
+        "https://kosis.example/notice.xml": _rss_feed(
+            [(title, f"https://kosis.example/{index}") for index, title in enumerate(_KOSIS_NOISE_TITLES)]
+        ),
+        "https://customs.example/press.xml": _rss_feed(
+            [(title, f"https://customs.example/noise-{index}") for index, title in enumerate(_CUSTOMS_NOISE_TITLES)]
+            + [(title, f"https://customs.example/keep-{index}") for index, title in enumerate(_CUSTOMS_USEFUL_TITLES)]
+        ),
+        "https://open.example/feed.xml": _rss_feed(
+            [
+                (_KOSIS_NOISE_TITLES[0], "https://open.example/event"),
+                (_CUSTOMS_USEFUL_TITLES[0], "https://open.example/export"),
+            ]
+        ),
+    }
+
+    def fake_get(url: str, *, timeout: int = 20) -> _Response:
+        if url.endswith("/robots.txt"):
+            return _Response(404, "missing", url=url)
+        if url in feeds:
+            return _Response(200, feeds[url], url=url)
+        raise AssertionError(url)
+
+    monkeypatch.setattr("commerceradar.collector._http_get", fake_get)
+    articles, report = collect_sources(_config(), project_root=tmp_path, log_raw=True)
+
+    kept = [(article.source, article.title) for article in articles]
+    assert kept == [
+        ("customs_trade_statistics", title) for title in _CUSTOMS_USEFUL_TITLES
+    ] + [
+        ("open_feed", _KOSIS_NOISE_TITLES[0]),
+        ("open_feed", _CUSTOMS_USEFUL_TITLES[0]),
+    ]
+    assert "2026년 9월 월간 수출입 현황 [잠정치]" in [article.title for article in articles]
+    by_id = {row["id"]: row for row in report["results"]}
+    assert by_id["kosis"]["status"] == "ok"
+    assert by_id["kosis"]["count"] == 0
+    assert by_id["kosis"]["excluded_count"] == len(_KOSIS_NOISE_TITLES)
+    assert by_id["customs_trade_statistics"]["count"] == len(_CUSTOMS_USEFUL_TITLES)
+    assert by_id["customs_trade_statistics"]["excluded_count"] == len(_CUSTOMS_NOISE_TITLES)
+    assert by_id["open_feed"]["count"] == 2
+    assert by_id["open_feed"]["excluded_count"] == 0
+
+    results_path = next((tmp_path / "data" / "raw").glob("*/source_results.json"))
+    saved = json.loads(results_path.read_text(encoding="utf-8"))
+    saved_by_id = {row["id"]: row for row in saved["results"]}
+    assert saved_by_id["kosis"]["excluded_count"] == len(_KOSIS_NOISE_TITLES)
+    assert saved_by_id["customs_trade_statistics"]["excluded_count"] == len(_CUSTOMS_NOISE_TITLES)
+    assert "excluded_count" in saved_by_id["open_feed"]
+    raw_path = next((tmp_path / "data" / "raw").glob("*/commerce_sources.jsonl"))
+    raw_rows = [json.loads(line) for line in raw_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    assert [row["title"] for row in raw_rows if row["source"] == "kosis"] == []
+    assert _KOSIS_NOISE_TITLES[0] in [row["title"] for row in raw_rows if row["source"] == "open_feed"]
+    assert "관세청 인사(부이사관 승진)" not in [row["title"] for row in raw_rows]
+    assert "2026년 9월 월간 수출입 현황 [잠정치]" in [row["title"] for row in raw_rows]

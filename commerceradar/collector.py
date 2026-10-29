@@ -183,12 +183,43 @@ def _parse_html_meta(page: str, *, url: str, source_id: str, category: str) -> l
     ]
 
 
+def _exclude_title_keywords(source: dict[str, Any]) -> list[str]:
+    """Read ``config.exclude_title_keywords``. A missing field passes every title."""
+    config = source.get("config")
+    if not isinstance(config, dict):
+        return []
+    raw = config.get("exclude_title_keywords")
+    if not isinstance(raw, list):
+        return []
+    keywords: list[str] = []
+    for item in raw:
+        if not isinstance(item, str):
+            continue
+        keyword = item.strip()
+        if keyword:
+            keywords.append(keyword)
+    return keywords
+
+
+def _keyword_matches_title(keyword: str, title: str) -> bool:
+    """Match Korean as a substring and ASCII as a whole word, with an optional plural ``s``."""
+    if re.search(r"[가-힣]", keyword):
+        return keyword in title
+    pattern = rf"(?<![A-Za-z0-9]){re.escape(keyword)}s?(?![A-Za-z0-9])"
+    return re.search(pattern, title, flags=re.IGNORECASE) is not None
+
+
+def _title_is_excluded(title: str, keywords: list[str]) -> bool:
+    return any(_keyword_matches_title(keyword, title) for keyword in keywords)
+
+
 def _result(
     source: dict[str, Any],
     *,
     status: str,
     count: int = 0,
     reason: str = "",
+    excluded_count: int = 0,
 ) -> dict[str, Any]:
     return {
         "id": str(source.get("id") or source.get("name") or "unknown"),
@@ -198,6 +229,7 @@ def _result(
         "status": status,
         "count": count,
         "reason": reason or str(source.get("notes") or ""),
+        "excluded_count": excluded_count,
     }
 
 
@@ -242,7 +274,15 @@ def _collect_one(source: dict[str, Any], *, category: str) -> tuple[list[Article
         return [], _result(source, status="error", reason=f"파싱 오류: {exc}")
     if not articles:
         return [], _result(source, status="error", reason="파싱 결과가 비어 있음")
-    return articles, _result(source, status="ok", count=len(articles), reason="")
+    keywords = _exclude_title_keywords(source)
+    kept: list[Article] = []
+    excluded_count = 0
+    for article in articles:
+        if keywords and _title_is_excluded(article.title, keywords):
+            excluded_count += 1
+            continue
+        kept.append(article)
+    return kept, _result(source, status="ok", count=len(kept), reason="", excluded_count=excluded_count)
 
 
 def _collection_report(results: list[dict[str, Any]], articles: list[Article]) -> dict[str, Any]:
