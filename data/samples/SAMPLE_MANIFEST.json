@@ -1,0 +1,33 @@
+{
+  "audit_tag": "OPS-AUDIT-20261022",
+  "created_by": "OPS-AUDIT follow-up 2026-10-29",
+  "policy": "삭제 없음. 항목은 원래 위치에 그대로 두고, is_sample 태그와 이 매니페스트로 실제 지표에서 제외한다.",
+  "items": [
+    {
+      "id": "t_jp_fragrance_hair",
+      "link": "https://example.jp/trend/fragrance-hair",
+      "source": "sample_trend",
+      "published": "2026-05-21T00:00:00+00:00"
+    },
+    {
+      "id": "t_jp_small_room_storage",
+      "link": "https://example.jp/trend/storage",
+      "source": "sample_trend",
+      "published": "2026-05-21T00:00:00+00:00"
+    }
+  ],
+  "seed_file": "data/samples/trends.jsonl",
+  "tagged_copy": "data/samples/historical_sample_trends.jsonl",
+  "untouched_copies": {
+    "pattern": "data/raw/<date>/commerce_kg_trends.jsonl",
+    "date_dirs": 78,
+    "first": "2026-07-30",
+    "last": "2026-10-19",
+    "note": "과거 데이터 재작성 금지. 이 파일들은 수정하지 않았고, 품질 리포트가 읽을 때 sample 행을 제외한다."
+  },
+  "evidence": [
+    "PR #2 본문: 최근 스케줄 실행 run 39335403294 로그 'articles (kg trends): 2', 그 2건은 샘플 트렌드",
+    "data/raw/2026-10-19/commerce_kg_trends.jsonl 2행: source=sample_trend, published=2026-05-21",
+    "PR #4 본문: 2026-10-22 리포트가 data/samples에서 만든 샘플 매칭 2건 포함"
+  ]
+}

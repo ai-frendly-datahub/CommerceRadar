@@ -131,7 +131,7 @@ def test_build_quality_report_accepts_enriched_raw_trends(tmp_path: Path) -> Non
                 "link": "https://example.com/trend",
                 "summary": "hair oil",
                 "published": "2026-05-21T00:00:00+00:00",
-                "source": "sample_trend",
+                "source": "kg_trend_log",
                 "category": "commerce",
                 "matched_entities": {
                     "Country": ["JP"],
