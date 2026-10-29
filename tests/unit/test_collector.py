@@ -208,3 +208,15 @@ def test_dedupe_jsonl_by_link_keeps_latest_record(tmp_path: Path) -> None:
 
     assert duplicates == 1
     assert rows == [{"title": "new", "link": "https://example.com/a", "ontology": {"kg_entity": {"id": "t1"}}}]
+def test_undated_public_items_do_not_use_collection_time_as_publication_date():
+    from commerceradar.collector import _parse_html_meta, _parse_rss
+
+    items = _parse_rss(
+        b'<rss><channel><item><title>Undated</title><link>https://example.org/a</link></item></channel></rss>',
+        source_id="public_feed", category="commerce",
+    )
+    assert items[0].published is None
+    items = _parse_html_meta(
+        "<title>Dataset</title>", url="https://example.org/data", source_id="registry", category="commerce",
+    )
+    assert items[0].published is None

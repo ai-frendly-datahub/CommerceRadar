@@ -29,13 +29,15 @@ def build_report_payload(
 ) -> dict[str, Any]:
     report_day = report_date or date.today()
     sample_dir = root / "data" / "samples"
-    manufacturers = load_manufacturers(sample_dir / "manufacturers.jsonl")
-    products = load_products(sample_dir / "products.jsonl")
-    distributors = load_distributors(sample_dir / "distributors.jsonl")
-    sellers = load_sellers(sample_dir / "sellers.jsonl")
-    trends = load_trends(sample_dir / "trends.jsonl")
-    evidence_rows = read_jsonl(sample_dir / "evidence_records.jsonl")
-    transaction_rows = read_jsonl(sample_dir / "transactions.jsonl")
+    # Public collection metadata is not evidence linking sample KG entities.
+    # Sample demos remain available to explicit offline callers (collection=None).
+    manufacturers = load_manufacturers(sample_dir / "manufacturers.jsonl") if collection is None else []
+    products = load_products(sample_dir / "products.jsonl") if collection is None else []
+    distributors = load_distributors(sample_dir / "distributors.jsonl") if collection is None else []
+    sellers = load_sellers(sample_dir / "sellers.jsonl") if collection is None else []
+    trends = load_trends(sample_dir / "trends.jsonl") if collection is None else []
+    evidence_rows = read_jsonl(sample_dir / "evidence_records.jsonl") if collection is None else []
+    transaction_rows = read_jsonl(sample_dir / "transactions.jsonl") if collection is None else []
 
     manufacturer_by_id = {item.id: item for item in manufacturers}
     cards: list[dict[str, Any]] = []
@@ -97,7 +99,7 @@ def build_report_payload(
     cards.sort(key=lambda item: (-float(item["score"]), str(item["title"])))
     matched_cards = [card for card in cards if float(card["score"]) >= 70.0]
     evidence_status_counts = Counter(str(card.get("evidence_status") or "unknown") for card in cards)
-    warnings = _report_warnings(cards)
+    warnings = _report_warnings(cards) if collection is None else []
     source_count = _enabled_source_count(root / "config" / "sources.yaml")
     # Sample evidence types are not collection results. With no public run, report zero.
     article_count = 0
@@ -124,6 +126,8 @@ def build_report_payload(
 
     return {
         "category": "commerce",
+        "data_scope": "sample_demo" if collection is None else "public_collection",
+        "matching_scope": "sample_demo" if collection is None else "not_evaluated",
         "date": report_day.isoformat(),
         "generated_at": datetime.now(UTC).isoformat(),
         "article_count": article_count,
@@ -195,6 +199,7 @@ def render_report_html(payload: dict[str, Any]) -> str:
   <main>
     <header>
       <h1>CommerceRadar B2B Match Report</h1>
+      <p>{'Sample demo · 운영 매칭·거래 실적 아님' if payload.get('data_scope') == 'sample_demo' else '공개 출처 수집 · 운영 매칭 미평가'}</p>
       <p>Generated at {html.escape(str(payload["generated_at"]))}</p>
     </header>
     <section class="summary">
