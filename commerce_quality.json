@@ -1,6 +1,6 @@
 {
   "category": "commerce",
-  "generated_at": "2026-10-28T22:43:40.709263+00:00",
+  "generated_at": "2026-10-29T22:53:04.762300+00:00",
   "sources_enabled": 4,
   "sources_fresh": 4,
   "collection_errors": 0,
@@ -8,13 +8,13 @@
     "required": 0,
     "passed": 0
   },
-  "daily_review_items": 34,
+  "daily_review_items": 23,
   "pending_evidence_items": 0,
   "warnings": [
     "sample quality score below threshold",
     "evidence records are expired or expiring soon"
   ],
-  "summary_file": "commerce_20261029_summary.json",
+  "summary_file": "commerce_20261030_summary.json",
   "data_quality_checks": {
     "row_counts": {
       "manufacturers": 2,
@@ -34,12 +34,13 @@
     "reference_error_count": 0,
     "reference_errors": [],
     "raw_trend_log": "data/raw/2026-10-19/commerce_kg_trends.jsonl",
-    "raw_trend_rows": 2,
+    "raw_trend_rows": 0,
+    "raw_trend_sample_rows_excluded": 2,
     "raw_trend_duplicate_link_count": 0,
     "raw_trend_missing_kg_id_count": 0,
     "raw_trend_missing_entity_count": 0,
     "raw_trend_missing_source_observed_at_count": 0,
-    "raw_trend_average_extraction_quality": 100.0,
+    "raw_trend_average_extraction_quality": 0.0,
     "average_quality_by_kind": {
       "manufacturers": 53.08,
       "products": 51.29,
