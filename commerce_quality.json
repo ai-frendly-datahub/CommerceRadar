@@ -1,6 +1,6 @@
 {
   "category": "commerce",
-  "generated_at": "2026-11-08T22:17:58.489475+00:00",
+  "generated_at": "2026-11-10T01:40:08.018175+00:00",
   "sources_enabled": 4,
   "sources_fresh": 4,
   "collection_errors": 0,
@@ -8,13 +8,13 @@
     "required": 0,
     "passed": 0
   },
-  "daily_review_items": 22,
+  "daily_review_items": 23,
   "pending_evidence_items": 0,
   "warnings": [
     "sample quality score below threshold",
     "evidence records are expired or expiring soon"
   ],
-  "summary_file": "commerce_20261109_summary.json",
+  "summary_file": "commerce_20261110_summary.json",
   "data_quality_checks": {
     "row_counts": {
       "manufacturers": 2,
