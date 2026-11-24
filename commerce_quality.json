@@ -1,6 +1,6 @@
 {
   "category": "commerce",
-  "generated_at": "2026-11-22T23:41:22.097770+00:00",
+  "generated_at": "2026-11-24T03:59:58.869905+00:00",
   "sources_enabled": 4,
   "sources_fresh": 4,
   "collection_errors": 0,
@@ -14,7 +14,7 @@
     "sample quality score below threshold",
     "evidence records are expired or expiring soon"
   ],
-  "summary_file": "commerce_20261123_summary.json",
+  "summary_file": "commerce_20261124_summary.json",
   "data_quality_checks": {
     "row_counts": {
       "manufacturers": 2,
